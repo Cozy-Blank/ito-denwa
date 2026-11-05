@@ -4,8 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>意図電話 | 痕跡を残さないふたりだけのP2P通話</title>
+    
+    <!-- 📱 PWA（スマホインストール）対応メタタグ -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="apple-touch-icon" href="icon.svg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="意図電話">
+    <meta name="theme-color" content="#0b1120">
+
     <!-- PeerJS CDN（P2P通信ライブラリ） -->
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+
     <style>
         :root {
             --bg-color: #0b1120;
@@ -15,7 +26,6 @@
             --text-muted: #94a3b8;
             --accent-color: #0ea5e9;
             --accent-glow: rgba(14, 165, 233, 0.25);
-            --thread-color: #38bdf8;
             --danger-color: #f43f5e;
             --success-color: #10b981;
         }
@@ -54,15 +64,15 @@
         /* 🎨 イラスト配置用スペース（後から自分のイラストに差し替え可能） */
         .illustration-area {
             width: 100%;
-            height: 160px;
-            margin: -8px 0 20px 0;
+            height: 140px;
+            margin: -6px 0 18px 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, transparent 70%);
             border-radius: 12px;
-            border: 1px dashed rgba(14, 165, 233, 0.2);
+            border: 1px dashed rgba(14, 165, 233, 0.25);
             text-align: center;
             position: relative;
         }
@@ -71,45 +81,41 @@
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            display: none; /* 画像がある場合は表示 */
+            display: none;
         }
 
         .illustration-placeholder {
             color: var(--text-muted);
             font-size: 0.85rem;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         .illustration-placeholder span {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             display: block;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         /* 🧵 タイトルヘッダー */
         .header {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .app-title {
-            font-size: 1.8rem;
+            font-size: 1.75rem;
             font-weight: 800;
             letter-spacing: 0.12em;
             background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 40%, #38bdf8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin: 0 0 6px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            margin: 0 0 4px 0;
         }
 
         .app-subtitle {
             font-size: 0.8rem;
             color: var(--text-muted);
-            letter-spacing: 0.05em;
+            letter-spacing: 0.04em;
             margin: 0;
         }
 
@@ -134,19 +140,56 @@
             box-shadow: 0 0 8px var(--success-color);
         }
 
-        /* 📋 ID表示・招待エリア */
-        .id-box {
+        /* 🔀 モード切り替えタブ */
+        .tab-group {
+            display: flex;
+            background: #0b1120;
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 9px 0;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: none;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #1e293b;
+            color: #38bdf8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: var(--text-color);
+            background: rgba(255, 255, 255, 0.04);
+            transform: none;
+        }
+
+        /* 📋 共通ボックス */
+        .content-box {
             background: #0b1120;
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 14px;
+            padding: 16px;
             margin-bottom: 20px;
         }
 
-        .id-label {
-            font-size: 0.75rem;
+        .box-label {
+            font-size: 0.78rem;
             color: var(--text-muted);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             display: block;
         }
 
@@ -202,20 +245,21 @@
             box-shadow: none;
         }
 
-        .btn-copy {
+        .btn-sub {
             background: rgba(14, 165, 233, 0.12);
             color: #38bdf8;
             border: 1px solid rgba(14, 165, 233, 0.3);
             box-shadow: none;
-            font-size: 0.8rem;
+            font-size: 0.82rem;
             padding: 8px 14px;
             width: auto;
             border-radius: 8px;
         }
 
-        .btn-copy:hover {
+        .btn-sub:hover:not(:disabled) {
             background: #0ea5e9;
             color: white;
+            transform: none;
         }
 
         .btn-end {
@@ -239,11 +283,6 @@
             background: rgba(244, 63, 94, 0.15);
             color: #f43f5e;
             border-color: rgba(244, 63, 94, 0.4);
-        }
-
-        /* 📞 発信エリア */
-        .call-section {
-            margin-bottom: 20px;
         }
 
         input {
@@ -305,7 +344,7 @@
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(6px);
             display: flex;
             align-items: center;
@@ -326,7 +365,6 @@
             box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3);
         }
 
-        /* 🍃 痕跡ゼロ消去メッセージ */
         .toast {
             font-size: 0.8rem;
             color: #10b981;
@@ -339,11 +377,25 @@
             border-radius: 8px;
         }
 
+        .pwa-hint {
+            background: rgba(14, 165, 233, 0.06);
+            border: 1px dashed rgba(14, 165, 233, 0.25);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            margin-top: 16px;
+            line-height: 1.5;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .footer-note {
             text-align: center;
             font-size: 0.72rem;
             color: var(--text-muted);
-            margin-top: 20px;
+            margin-top: 18px;
             line-height: 1.6;
         }
     </style>
@@ -352,7 +404,7 @@
 
     <div class="container">
         <main class="card">
-            <!-- 🎨 イラスト配置枠（後から差し替え可能） -->
+            <!-- 🎨 イラスト配置枠 -->
             <div class="illustration-area">
                 <img id="custom-illust" src="" alt="意図電話イラスト">
                 <div class="illustration-placeholder" id="illust-placeholder">
@@ -372,22 +424,56 @@
                 </div>
             </div>
 
-            <!-- 🏠 発信前のメインエリア -->
-            <div id="standby-area">
-                <!-- 自分のID ＆ 招待リンク -->
-                <div class="id-box">
-                    <span class="id-label">あなたへの直通コード（意図コード）</span>
-                    <div class="id-val-row">
-                        <span class="my-id-text" id="my-peer-id">発行中...</span>
-                        <button class="btn-copy" onclick="copyInviteLink()">招待URLをコピー</button>
+            <!-- 🔀 モード切り替えタブ -->
+            <div class="tab-group" id="mode-tabs">
+                <button type="button" class="tab-btn active" onclick="switchMode('room')">
+                    🏠 秘密の合言葉ルーム
+                </button>
+                <button type="button" class="tab-btn" onclick="switchMode('direct')">
+                    🔗 一期一会コード
+                </button>
+            </div>
+
+            <!-- 🏠 モード1：合言葉ルーム（家族・非常用集合ルーム） -->
+            <div id="mode-room-panel">
+                <div class="content-box">
+                    <label class="box-label" for="room-input">
+                        家族・仲間で決めた「合言葉」を入力
+                    </label>
+                    <input type="text" id="room-input" placeholder="例: yamada-sos または ito-kazoku">
+                    
+                    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                        <button type="button" onclick="joinRoomAs('wait')" style="background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);">
+                            🏠 部屋で待機する
+                        </button>
+                        <button type="button" onclick="joinRoomAs('call')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                            📞 部屋に入って呼ぶ
+                        </button>
                     </div>
+
+                    <button type="button" class="btn-sub" onclick="copyRoomLink()" style="width: 100%;">
+                        🔗 この合言葉ルームの招待URLをコピー
+                    </button>
                 </div>
 
-                <!-- 相手へ発信 -->
-                <div class="call-section">
-                    <label class="id-label" for="target-id-input">相手の意図コードを入力して発信</label>
+                <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 4px 16px 4px; line-height: 1.5;">
+                    💡 <strong>災害・緊急時の使い方：</strong><br>
+                    通常の電話やLINEがダウンした際、全員があらかじめ決めた合言葉（例: <code>yamada-sos</code>）を入力して合流できます。
+                </p>
+            </div>
+
+            <!-- 🔗 モード2：一期一会コード（今までのランダムID） -->
+            <div id="mode-direct-panel" style="display: none;">
+                <div class="content-box">
+                    <span class="box-label">あなたの直通コード</span>
+                    <div class="id-val-row" style="margin-bottom: 12px;">
+                        <span class="my-id-text" id="my-peer-id">発行中...</span>
+                        <button class="btn-sub" onclick="copyDirectLink()">URLコピー</button>
+                    </div>
+
+                    <label class="box-label" for="target-id-input">相手の直通コードを入力して発信</label>
                     <input type="text" id="target-id-input" placeholder="例: ito-xxxx">
-                    <button id="call-btn" onclick="startCall()" disabled>
+                    <button id="direct-call-btn" onclick="startDirectCall()" disabled>
                         <span>📞</span> 意図電話をかける
                     </button>
                 </div>
@@ -397,7 +483,7 @@
             <div id="in-call-area" class="in-call-panel">
                 <div class="pulsing-wave">🧵</div>
                 <div class="call-timer" id="call-timer">00:00</div>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+                <p id="call-status-desc" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
                     🔒 端末間直通・エンドツーエンド暗号化通話中
                 </p>
 
@@ -416,8 +502,17 @@
                 🍃 通話は終了しました。サーバー・端末に通話記録は一切残っていません。
             </div>
 
+            <!-- 📱 スマホホーム画面追加ガイド -->
+            <div class="pwa-hint">
+                <span style="font-size: 1.3rem;">📲</span>
+                <div>
+                    <strong>ホーム画面に追加してアプリ化</strong><br>
+                    Safariの「共有」ボタン ➡️ 「ホーム画面に追加」を押すと、本物のアプリとして全画面で使えます。
+                </div>
+            </div>
+
             <p class="footer-note">
-                ※WebRTC技術により、音声データはサーバーを一切経由せず相手の端末へ直接届きます。通話終了後、通信の痕跡は完全に消滅します。
+                ※WebRTC暗号化通信。音声はサーバーを通さず端末同士で直接やりとりされ、通話終了後に痕跡は完全消滅します。
             </p>
         </main>
     </div>
@@ -427,7 +522,7 @@
         <div class="modal-card">
             <div style="font-size: 3rem; margin-bottom: 10px;">📞</div>
             <h3 style="margin: 0 0 8px 0; color: #fff;">意図電話の着信</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+            <p id="incoming-caller-desc" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
                 相手から直通通話の呼び出しが届いています。
             </p>
             <div style="display: flex; gap: 10px;">
@@ -445,6 +540,15 @@
     <audio id="remote-audio" autoplay playsinline></audio>
 
     <script>
+        // Service Worker の登録（PWA用）
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js').catch(err => {
+                    console.log('SW registration failed: ', err);
+                });
+            });
+        }
+
         // 状態管理
         let peer = null;
         let localStream = null;
@@ -453,22 +557,35 @@
         let timerInterval = null;
         let elapsedSeconds = 0;
         let isMuted = false;
+        let currentMode = 'room'; // 'room' | 'direct'
 
         // DOM要素
         const myPeerIdEl = document.getElementById('my-peer-id');
         const targetIdInput = document.getElementById('target-id-input');
-        const callBtn = document.getElementById('call-btn');
+        const directCallBtn = document.getElementById('direct-call-btn');
         const p2pStatus = document.getElementById('p2p-status');
-        const standbyArea = document.getElementById('standby-area');
+        const modeRoomPanel = document.getElementById('mode-room-panel');
+        const modeDirectPanel = document.getElementById('mode-direct-panel');
         const inCallArea = document.getElementById('in-call-area');
         const callTimerEl = document.getElementById('call-timer');
         const incomingModal = document.getElementById('incoming-modal');
         const remoteAudio = document.getElementById('remote-audio');
         const muteBtn = document.getElementById('mute-btn');
         const toast = document.getElementById('zero-trace-toast');
+        const roomInput = document.getElementById('room-input');
+        const tabs = document.querySelectorAll('.tab-btn');
 
-        // ランダムな短い合言葉（意図コード）生成
-        function generateId() {
+        // タブ切り替え
+        function switchMode(mode) {
+            currentMode = mode;
+            tabs[0].classList.toggle('active', mode === 'room');
+            tabs[1].classList.toggle('active', mode === 'direct');
+            modeRoomPanel.style.display = mode === 'room' ? 'block' : 'none';
+            modeDirectPanel.style.display = mode === 'direct' ? 'block' : 'none';
+        }
+
+        // ランダムID生成
+        function generateRandomId() {
             const chars = 'abcdefghijkmnpqrstuvwxyz23456789';
             let res = 'ito-';
             for (let i = 0; i < 4; i++) {
@@ -477,33 +594,32 @@
             return res;
         }
 
-        // 初期化：PeerJSの接続
-        function initPeer() {
-            const initialId = generateId();
-            peer = new Peer(initialId, {
-                debug: 1
-            });
+        // Peer初期化
+        function initPeer(customId = null) {
+            if (peer) {
+                peer.destroy();
+                peer = null;
+            }
+
+            const idToUse = customId || generateRandomId();
+            peer = new Peer(idToUse, { debug: 1 });
 
             peer.on('open', (id) => {
                 myPeerIdEl.textContent = id;
-                callBtn.disabled = false;
-                p2pStatus.textContent = 'P2P回線：通話待機中';
-
-                // URLパラメータに call 相手があれば自動セット
-                const params = new URLSearchParams(window.location.search);
-                const target = params.get('call');
-                if (target && target !== id) {
-                    targetIdInput.value = target;
-                }
+                directCallBtn.disabled = false;
+                p2pStatus.textContent = customId ? `待機中（部屋: ${id.replace('ito-room-', '')}）` : 'P2P回線：通話待機中';
             });
 
             peer.on('error', (err) => {
                 console.error(err);
                 if (err.type === 'unavailable-id') {
-                    // IDが重複していたら再生成
-                    setTimeout(initPeer, 500);
+                    if (customId) {
+                        alert('その部屋はすでに別の方が待機中です。「部屋に入って呼ぶ」をお試しください。');
+                    } else {
+                        setTimeout(() => initPeer(), 400);
+                    }
                 } else {
-                    alert('接続エラーが発生しました: ' + err.type);
+                    p2pStatus.textContent = '回線準備中...';
                 }
             });
 
@@ -522,23 +638,49 @@
             return localStream;
         }
 
-        // 発信処理
-        async function startCall() {
+        // --- 🏠 合言葉ルームのロジック ---
+        // 部屋名から安全なPeerIDを生成
+        function sanitizeRoomId(name) {
+            return 'ito-room-' + encodeURIComponent(name.trim().toLowerCase());
+        }
+
+        // 部屋で待機する
+        function joinRoomAs(role) {
+            const roomName = roomInput.value.trim();
+            if (!roomName) return alert('合言葉を入力してください（例: yamada-sos）');
+
+            const hostPeerId = sanitizeRoomId(roomName);
+
+            if (role === 'wait') {
+                // 自分がホスト（待機側）として部屋を開く
+                p2pStatus.textContent = `「${roomName}」で待機開始中...`;
+                initPeer(hostPeerId);
+                alert(`🏠 合言葉「${roomName}」の部屋を開きました。\n相手が入室してくるのをお待ちください。`);
+            } else {
+                // 相手（ホスト）を呼び出す発信
+                callTargetPeer(hostPeerId, `合言葉部屋「${roomName}」`);
+            }
+        }
+
+        // --- 🔗 一期一会コードのロジック ---
+        function startDirectCall() {
             const targetId = targetIdInput.value.trim();
-            if (!targetId) return alert('相手の意図コードを入力してください');
+            if (!targetId) return alert('相手の直通コードを入力してください');
             if (targetId === peer.id) return alert('自分自身には発信できません');
 
-            callBtn.disabled = true;
-            p2pStatus.textContent = '相手に接続中...';
+            callTargetPeer(targetId, targetId);
+        }
 
+        // 共通発信処理
+        async function callTargetPeer(targetId, displayName) {
+            p2pStatus.textContent = `${displayName} に接続中...`;
             try {
                 const stream = await getLocalStream();
                 currentCall = peer.call(targetId, stream);
                 setupCallEvents(currentCall);
             } catch (err) {
                 console.error(err);
-                alert('マイクのアクセスが許可されませんでした。設定からマイクを許可してください。');
-                callBtn.disabled = false;
+                alert('マイクのアクセスが許可されませんでした。ブラウザの設定からマイクを許可してください。');
                 p2pStatus.textContent = 'P2P回線：通話待機中';
             }
         }
@@ -589,7 +731,9 @@
 
         // 通話中画面の表示
         function showInCallScreen() {
-            standbyArea.style.display = 'none';
+            modeRoomPanel.style.display = 'none';
+            modeDirectPanel.style.display = 'none';
+            document.getElementById('mode-tabs').style.display = 'none';
             inCallArea.style.display = 'block';
             toast.style.display = 'none';
             p2pStatus.textContent = 'P2P通話中（直通暗号化）';
@@ -621,7 +765,7 @@
             muteBtn.innerHTML = isMuted ? '🔇 ミュート中' : '🎤 ミュート';
         }
 
-        // 手動での通話終了
+        // 手動通話終了
         function endCall() {
             if (currentCall) {
                 currentCall.close();
@@ -629,47 +773,69 @@
             endCallLocally();
         }
 
-        // 通話終了処理（痕跡ゼロ・ストリーム破棄）
+        // 通話終了処理（痕跡完全消去）
         function endCallLocally() {
             clearInterval(timerInterval);
             currentCall = null;
             incomingCallObj = null;
 
-            // マイクストリームを停止して痕跡を残さない
             if (localStream) {
                 localStream.getTracks().forEach(track => track.stop());
                 localStream = null;
             }
             remoteAudio.srcObject = null;
 
-            // 画面を戻す
+            // 画面を元に戻す
             inCallArea.style.display = 'none';
-            standbyArea.style.display = 'block';
-            callBtn.disabled = false;
+            document.getElementById('mode-tabs').style.display = 'flex';
+            switchMode(currentMode);
             p2pStatus.textContent = 'P2P回線：通話待機中';
 
-            // 痕跡ゼロ消去トースト表示
             toast.style.display = 'block';
             setTimeout(() => {
                 toast.style.display = 'none';
             }, 5000);
         }
 
-        // 招待リンクのコピー
-        function copyInviteLink() {
+        // 共有URLコピー
+        function copyRoomLink() {
+            const roomName = roomInput.value.trim();
+            if (!roomName) return alert('合言葉を入力してください');
+            const url = `${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(roomName)}`;
+            copyToClipboard(url, `🏠 合言葉「${roomName}」の直通URLをコピーしました！`);
+        }
+
+        function copyDirectLink() {
             const peerId = myPeerIdEl.textContent;
             if (!peerId || peerId === '発行中...') return;
             const url = `${window.location.origin}${window.location.pathname}?call=${peerId}`;
+            copyToClipboard(url, '🧵 一期一会コードの直通URLをコピーしました！');
+        }
 
-            navigator.clipboard.writeText(url).then(() => {
-                alert('🧵 意図電話の招待URLをコピーしました！\nこのリンクを相手に送ると、開くだけであなたに直通発信できます。');
+        function copyToClipboard(text, message) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert(message + '\n相手に送れば、開くだけで合流できます。');
             }).catch(() => {
-                prompt('以下のURLをコピーして相手に送ってください：', url);
+                prompt('以下のURLをコピーして送ってください：', text);
             });
         }
 
-        // 起動
-        window.addEventListener('load', initPeer);
+        // 起動時処理（URLパラメータ判定）
+        window.addEventListener('load', () => {
+            const params = new URLSearchParams(window.location.search);
+            const room = params.get('room');
+            const call = params.get('call');
+
+            if (room) {
+                switchMode('room');
+                roomInput.value = room;
+            } else if (call) {
+                switchMode('direct');
+                targetIdInput.value = call;
+            }
+
+            initPeer();
+        });
     </script>
 </body>
 </html>
