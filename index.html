@@ -16,6 +16,8 @@
 
     <!-- PeerJS CDN（P2P通信ライブラリ） -->
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <!-- QRコード読み取り＆生成ライブラリ -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
     <style>
         :root {
@@ -400,6 +402,59 @@
             margin-top: 18px;
             line-height: 1.6;
         }
+    
+        /* 📷 QRコード関連スタイル */
+        .qr-action-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .btn-qr {
+            background: rgba(14, 165, 233, 0.12);
+            color: #38bdf8;
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            font-size: 0.8rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-qr:hover {
+            background: #0ea5e9;
+            color: white;
+        }
+
+        /* QRカメラスキャナー枠 */
+        #qr-reader {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #0ea5e9;
+            background: #000;
+        }
+
+        /* 🖨️ QR印刷カードモーダル */
+        .qr-print-box {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            color: #1e293b;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .qr-print-img {
+            width: 200px;
+            height: 200px;
+            margin: 10px auto;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -515,6 +570,37 @@
         </main>
     </div>
 
+    <!-- 📷 QRスキャナーモーダル -->
+    <div id="qr-scan-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 380px;">
+            <h3 style="margin: 0 0 8px 0; color: #fff;">📷 QRコードをかざしてください</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">
+                スマホケースに挟んだQRコードをカメラに向けると、自動で合流します。
+            </p>
+            <div id="qr-reader"></div>
+            <button type="button" onclick="closeQrScanner()" class="btn-secondary" style="margin-top: 15px; background: #1e293b; color: #cbd5e1;">
+                キャンセル
+            </button>
+        </div>
+    </div>
+
+    <!-- 🖨️ スマホケース用QR表示モーダル -->
+    <div id="qr-display-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 340px;">
+            <div class="qr-print-box">
+                <span style="font-size: 0.8rem; font-weight: bold; color: #0284c7;">🧵 意図電話 非常用直通コード</span>
+                <img id="qr-display-image" class="qr-print-img" src="" alt="QRコード">
+                <div id="qr-room-label" style="font-size: 0.95rem; font-weight: bold; color: #0f172a; font-family: monospace;"></div>
+                <p style="font-size: 0.72rem; color: #64748b; margin-top: 6px;">
+                    ※この画面をスクショして印刷し、スマホケースの裏に挟んでお使いください。
+                </p>
+            </div>
+            <button type="button" onclick="closeQrGenerator()" class="btn-secondary" style="margin-top: 15px; background: #1e293b; color: #cbd5e1;">
+                閉じる
+            </button>
+        </div>
+    </div>
+
     <!-- 🔔 着信モーダル -->
     <div id="incoming-modal" class="modal-overlay">
         <div class="modal-card">
@@ -572,6 +658,86 @@
         const toast = document.getElementById('zero-trace-toast');
         const roomInput = document.getElementById('room-input');
         const tabs = document.querySelectorAll('.tab-btn');
+
+        // --- 📷 QRコード関連の処理 ---
+        let html5QrCode = null;
+
+        // QRスキャナーを開く
+        async function openQrScanner() {
+            document.getElementById('qr-scan-modal').style.display = 'flex';
+            html5QrCode = new Html5Qrcode("qr-reader");
+
+            const config = { fps: 10, qrbox: { width: 220, height: 220 } };
+
+            try {
+                await html5QrCode.start(
+                    { facingMode: "environment" }, // 外カメラ優先
+                    config,
+                    (decodedText) => {
+                        // 読み取り成功！
+                        handleQrSuccess(decodedText);
+                    },
+                    (errorMessage) => {
+                        // スキャン中の微細なエラーは無視
+                    }
+                );
+            } catch (err) {
+                console.error(err);
+                alert('カメラの起動に失敗しました。カメラのアクセス許可を確認してください。');
+                closeQrScanner();
+            }
+        }
+
+        // QR読み取り成功時の処理
+        function handleQrSuccess(text) {
+            closeQrScanner();
+
+            // URLからroomパラメータを取り出すか、直接テキストを合言葉にする
+            let targetRoom = text;
+            try {
+                const url = new URL(text);
+                const roomParam = url.searchParams.get('room');
+                if (roomParam) targetRoom = roomParam;
+            } catch (e) {
+                // 通常テキスト
+            }
+
+            roomInput.value = targetRoom;
+            alert('🎉 QRコードを読み取りました！
+合言葉: ' + targetRoom);
+            
+            // 自動で部屋に入る
+            joinRoomAs('call');
+        }
+
+        // QRスキャナーを閉じる
+        async function closeQrScanner() {
+            if (html5QrCode) {
+                try {
+                    await html5QrCode.stop();
+                    html5QrCode.clear();
+                } catch (e) {}
+                html5QrCode = null;
+            }
+            document.getElementById('qr-scan-modal').style.display = 'none';
+        }
+
+        // 🖨️ ケース用QRコードを表示する
+        function openQrGenerator() {
+            const roomName = roomInput.value.trim() || 'ito-kazoku';
+            roomInput.value = roomName;
+
+            const targetUrl = `${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(roomName)}`;
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(targetUrl)}`;
+
+            document.getElementById('qr-display-image').src = qrApiUrl;
+            document.getElementById('qr-room-label').textContent = '合言葉: ' + roomName;
+            document.getElementById('qr-display-modal').style.display = 'flex';
+        }
+
+        function closeQrGenerator() {
+            document.getElementById('qr-display-modal').style.display = 'none';
+        }
 
         // タブ切り替え
         function switchMode(mode) {
