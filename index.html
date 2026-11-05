@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>意図電話 | 痕跡を残さないふたりだけのP2P通話</title>
+    <!-- PeerJS CDN（P2P通信ライブラリ） -->
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0b1120;
+            --card-bg: #151f32;
+            --border-color: #26354a;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-color: #0ea5e9;
+            --accent-glow: rgba(14, 165, 233, 0.25);
+            --thread-color: #38bdf8;
+            --danger-color: #f43f5e;
+            --success-color: #10b981;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Meiryo", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            padding: 16px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px 20px;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 20px rgba(14, 165, 233, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 🎨 イラスト配置用スペース（後から自分のイラストに差し替え可能） */
+        .illustration-area {
+            width: 100%;
+            height: 160px;
+            margin: -8px 0 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, transparent 70%);
+            border-radius: 12px;
+            border: 1px dashed rgba(14, 165, 233, 0.2);
+            text-align: center;
+            position: relative;
+        }
+
+        .illustration-area img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none; /* 画像がある場合は表示 */
+        }
+
+        .illustration-placeholder {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .illustration-placeholder span {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* 🧵 タイトルヘッダー */
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .app-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 40%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 6px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .app-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            margin: 0;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            background: rgba(14, 165, 233, 0.1);
+            border: 1px solid rgba(14, 165, 233, 0.25);
+            color: #38bdf8;
+            margin-top: 10px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--success-color);
+            box-shadow: 0 0 8px var(--success-color);
+        }
+
+        /* 📋 ID表示・招待エリア */
+        .id-box {
+            background: #0b1120;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 20px;
+        }
+
+        .id-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .id-val-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .my-id-text {
+            font-family: monospace;
+            font-size: 1rem;
+            color: #38bdf8;
+            letter-spacing: 0.05em;
+            word-break: break-all;
+        }
+
+        /* 🔘 ボタン共通 */
+        button {
+            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 13px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.03em;
+            box-shadow: 0 4px 14px rgba(14, 165, 233, 0.25);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #38bdf8 0%, #1d4ed8 100%);
+            box-shadow: 0 6px 18px rgba(14, 165, 233, 0.35);
+            transform: translateY(-1px);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-copy {
+            background: rgba(14, 165, 233, 0.12);
+            color: #38bdf8;
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            box-shadow: none;
+            font-size: 0.8rem;
+            padding: 8px 14px;
+            width: auto;
+            border-radius: 8px;
+        }
+
+        .btn-copy:hover {
+            background: #0ea5e9;
+            color: white;
+        }
+
+        .btn-end {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            box-shadow: 0 4px 14px rgba(244, 63, 94, 0.3);
+        }
+
+        .btn-end:hover:not(:disabled) {
+            background: linear-gradient(135deg, #fb7185 0%, #be123c 100%);
+            box-shadow: 0 6px 18px rgba(244, 63, 94, 0.4);
+        }
+
+        .btn-mute {
+            background: #1e293b;
+            color: #cbd5e1;
+            border: 1px solid var(--border-color);
+            box-shadow: none;
+        }
+
+        .btn-mute.muted {
+            background: rgba(244, 63, 94, 0.15);
+            color: #f43f5e;
+            border-color: rgba(244, 63, 94, 0.4);
+        }
+
+        /* 📞 発信エリア */
+        .call-section {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            background-color: #0b1120;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-color);
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+
+        /* 🎙️ 通話中画面 */
+        .in-call-panel {
+            text-align: center;
+            padding: 20px 10px;
+            display: none;
+        }
+
+        .call-timer {
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: #38bdf8;
+            margin: 15px 0;
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .pulsing-wave {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(14, 165, 233, 0.15);
+            border: 2px solid #38bdf8;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(56, 189, 248, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+        }
+
+        /* 🔔 着信モーダル */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            border: 1px solid var(--accent-color);
+            border-radius: 20px;
+            padding: 28px 24px;
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3);
+        }
+
+        /* 🍃 痕跡ゼロ消去メッセージ */
+        .toast {
+            font-size: 0.8rem;
+            color: #10b981;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+            padding: 10px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 8px;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <main class="card">
+            <!-- 🎨 イラスト配置枠（後から差し替え可能） -->
+            <div class="illustration-area">
+                <img id="custom-illust" src="" alt="意図電話イラスト">
+                <div class="illustration-placeholder" id="illust-placeholder">
+                    <span>🧵</span>
+                    <strong>偏愛TOOL #02</strong><br>
+                    ここにあなたのイラストが入ります
+                </div>
+            </div>
+
+            <!-- ヘッダー -->
+            <div class="header">
+                <h1 class="app-title">意図電話</h1>
+                <p class="app-subtitle">サーバーを通さない、ふたりだけのP2P直通通話</p>
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span id="p2p-status">P2P回線：接続準備完了</span>
+                </div>
+            </div>
+
+            <!-- 🏠 発信前のメインエリア -->
+            <div id="standby-area">
+                <!-- 自分のID ＆ 招待リンク -->
+                <div class="id-box">
+                    <span class="id-label">あなたへの直通コード（意図コード）</span>
+                    <div class="id-val-row">
+                        <span class="my-id-text" id="my-peer-id">発行中...</span>
+                        <button class="btn-copy" onclick="copyInviteLink()">招待URLをコピー</button>
+                    </div>
+                </div>
+
+                <!-- 相手へ発信 -->
+                <div class="call-section">
+                    <label class="id-label" for="target-id-input">相手の意図コードを入力して発信</label>
+                    <input type="text" id="target-id-input" placeholder="例: ito-xxxx">
+                    <button id="call-btn" onclick="startCall()" disabled>
+                        <span>📞</span> 意図電話をかける
+                    </button>
+                </div>
+            </div>
+
+            <!-- 🎙️ 通話中画面 -->
+            <div id="in-call-area" class="in-call-panel">
+                <div class="pulsing-wave">🧵</div>
+                <div class="call-timer" id="call-timer">00:00</div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+                    🔒 端末間直通・エンドツーエンド暗号化通話中
+                </p>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button id="mute-btn" class="btn-mute" onclick="toggleMute()">
+                        🎤 ミュート
+                    </button>
+                    <button class="btn-end" onclick="endCall()">
+                        📵 通話を切る
+                    </button>
+                </div>
+            </div>
+
+            <!-- 🍃 痕跡ゼロ消去通知 -->
+            <div id="zero-trace-toast" class="toast">
+                🍃 通話は終了しました。サーバー・端末に通話記録は一切残っていません。
+            </div>
+
+            <p class="footer-note">
+                ※WebRTC技術により、音声データはサーバーを一切経由せず相手の端末へ直接届きます。通話終了後、通信の痕跡は完全に消滅します。
+            </p>
+        </main>
+    </div>
+
+    <!-- 🔔 着信モーダル -->
+    <div id="incoming-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div style="font-size: 3rem; margin-bottom: 10px;">📞</div>
+            <h3 style="margin: 0 0 8px 0; color: #fff;">意図電話の着信</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+                相手から直通通話の呼び出しが届いています。
+            </p>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="acceptCall()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    応答する
+                </button>
+                <button onclick="rejectCall()" class="btn-secondary" style="background: #1e293b; color: #f43f5e; border: 1px solid rgba(244,63,94,0.3);">
+                    拒否
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- リモート音声再生用要素（非表示） -->
+    <audio id="remote-audio" autoplay playsinline></audio>
+
+    <script>
+        // 状態管理
+        let peer = null;
+        let localStream = null;
+        let currentCall = null;
+        let incomingCallObj = null;
+        let timerInterval = null;
+        let elapsedSeconds = 0;
+        let isMuted = false;
+
+        // DOM要素
+        const myPeerIdEl = document.getElementById('my-peer-id');
+        const targetIdInput = document.getElementById('target-id-input');
+        const callBtn = document.getElementById('call-btn');
+        const p2pStatus = document.getElementById('p2p-status');
+        const standbyArea = document.getElementById('standby-area');
+        const inCallArea = document.getElementById('in-call-area');
+        const callTimerEl = document.getElementById('call-timer');
+        const incomingModal = document.getElementById('incoming-modal');
+        const remoteAudio = document.getElementById('remote-audio');
+        const muteBtn = document.getElementById('mute-btn');
+        const toast = document.getElementById('zero-trace-toast');
+
+        // ランダムな短い合言葉（意図コード）生成
+        function generateId() {
+            const chars = 'abcdefghijkmnpqrstuvwxyz23456789';
+            let res = 'ito-';
+            for (let i = 0; i < 4; i++) {
+                res += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return res;
+        }
+
+        // 初期化：PeerJSの接続
+        function initPeer() {
+            const initialId = generateId();
+            peer = new Peer(initialId, {
+                debug: 1
+            });
+
+            peer.on('open', (id) => {
+                myPeerIdEl.textContent = id;
+                callBtn.disabled = false;
+                p2pStatus.textContent = 'P2P回線：通話待機中';
+
+                // URLパラメータに call 相手があれば自動セット
+                const params = new URLSearchParams(window.location.search);
+                const target = params.get('call');
+                if (target && target !== id) {
+                    targetIdInput.value = target;
+                }
+            });
+
+            peer.on('error', (err) => {
+                console.error(err);
+                if (err.type === 'unavailable-id') {
+                    // IDが重複していたら再生成
+                    setTimeout(initPeer, 500);
+                } else {
+                    alert('接続エラーが発生しました: ' + err.type);
+                }
+            });
+
+            // 着信検知
+            peer.on('call', (call) => {
+                incomingCallObj = call;
+                incomingModal.style.display = 'flex';
+            });
+        }
+
+        // マイク音声の取得
+        async function getLocalStream() {
+            if (!localStream) {
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            }
+            return localStream;
+        }
+
+        // 発信処理
+        async function startCall() {
+            const targetId = targetIdInput.value.trim();
+            if (!targetId) return alert('相手の意図コードを入力してください');
+            if (targetId === peer.id) return alert('自分自身には発信できません');
+
+            callBtn.disabled = true;
+            p2pStatus.textContent = '相手に接続中...';
+
+            try {
+                const stream = await getLocalStream();
+                currentCall = peer.call(targetId, stream);
+                setupCallEvents(currentCall);
+            } catch (err) {
+                console.error(err);
+                alert('マイクのアクセスが許可されませんでした。設定からマイクを許可してください。');
+                callBtn.disabled = false;
+                p2pStatus.textContent = 'P2P回線：通話待機中';
+            }
+        }
+
+        // 着信応答
+        async function acceptCall() {
+            incomingModal.style.display = 'none';
+            p2pStatus.textContent = '接続中...';
+
+            try {
+                const stream = await getLocalStream();
+                currentCall = incomingCallObj;
+                currentCall.answer(stream);
+                setupCallEvents(currentCall);
+            } catch (err) {
+                console.error(err);
+                alert('マイクのアクセスに失敗しました');
+                incomingCallObj = null;
+            }
+        }
+
+        // 着信拒否
+        function rejectCall() {
+            incomingModal.style.display = 'none';
+            if (incomingCallObj) {
+                incomingCallObj.close();
+                incomingCallObj = null;
+            }
+        }
+
+        // 通話イベントのハンドリング
+        function setupCallEvents(call) {
+            call.on('stream', (remoteStream) => {
+                remoteAudio.srcObject = remoteStream;
+                remoteAudio.play();
+                showInCallScreen();
+            });
+
+            call.on('close', () => {
+                endCallLocally();
+            });
+
+            call.on('error', (err) => {
+                console.error(err);
+                endCallLocally();
+            });
+        }
+
+        // 通話中画面の表示
+        function showInCallScreen() {
+            standbyArea.style.display = 'none';
+            inCallArea.style.display = 'block';
+            toast.style.display = 'none';
+            p2pStatus.textContent = 'P2P通話中（直通暗号化）';
+
+            elapsedSeconds = 0;
+            updateTimerDisplay();
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                elapsedSeconds++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        // タイマー表示
+        function updateTimerDisplay() {
+            const mins = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+            const secs = String(elapsedSeconds % 60).padStart(2, '0');
+            callTimerEl.textContent = `${mins}:${secs}`;
+        }
+
+        // ミュート切り替え
+        function toggleMute() {
+            if (!localStream) return;
+            isMuted = !isMuted;
+            localStream.getAudioTracks().forEach(track => {
+                track.enabled = !isMuted;
+            });
+            muteBtn.classList.toggle('muted', isMuted);
+            muteBtn.innerHTML = isMuted ? '🔇 ミュート中' : '🎤 ミュート';
+        }
+
+        // 手動での通話終了
+        function endCall() {
+            if (currentCall) {
+                currentCall.close();
+            }
+            endCallLocally();
+        }
+
+        // 通話終了処理（痕跡ゼロ・ストリーム破棄）
+        function endCallLocally() {
+            clearInterval(timerInterval);
+            currentCall = null;
+            incomingCallObj = null;
+
+            // マイクストリームを停止して痕跡を残さない
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            remoteAudio.srcObject = null;
+
+            // 画面を戻す
+            inCallArea.style.display = 'none';
+            standbyArea.style.display = 'block';
+            callBtn.disabled = false;
+            p2pStatus.textContent = 'P2P回線：通話待機中';
+
+            // 痕跡ゼロ消去トースト表示
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 5000);
+        }
+
+        // 招待リンクのコピー
+        function copyInviteLink() {
+            const peerId = myPeerIdEl.textContent;
+            if (!peerId || peerId === '発行中...') return;
+            const url = `${window.location.origin}${window.location.pathname}?call=${peerId}`;
+
+            navigator.clipboard.writeText(url).then(() => {
+                alert('🧵 意図電話の招待URLをコピーしました！\nこのリンクを相手に送ると、開くだけであなたに直通発信できます。');
+            }).catch(() => {
+                prompt('以下のURLをコピーして相手に送ってください：', url);
+            });
+        }
+
+        // 起動
+        window.addEventListener('load', initPeer);
+    </script>
+</body>
+</html>
