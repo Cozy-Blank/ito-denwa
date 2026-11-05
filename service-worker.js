@@ -1,10 +1,11 @@
 // 意図電話 Service Worker (PWAインストール対応)
-const CACHE_NAME = 'ito-denwa-v1';
+const CACHE_NAME = 'ito-denwa-v2';
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon.svg'
+  '/icon.svg',
+  '/hero.jpg'
 ];
 
 self.addEventListener('install', (event) => {
@@ -32,7 +33,6 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // ネットワーク優先、失敗時にキャッシュから取得
   event.respondWith(
     fetch(event.request).catch(() => {
       return caches.match(event.request);
