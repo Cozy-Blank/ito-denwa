@@ -1,11 +1,11 @@
 // 意図電話 Service Worker (PWAインストール対応)
-const CACHE_NAME = 'ito-denwa-v3';
+const CACHE_NAME = 'ito-denwa-v5';
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
   '/icon.svg',
-  '/hero.jpg'
+  '/ito-denwa.png'
 ];
 
 self.addEventListener('install', (event) => {
