@@ -823,7 +823,7 @@
                 <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 4px 16px 4px; line-height: 1.5;">
                     💡 <strong>使い方のヒント：</strong><br>
                     合言葉の末尾に <code>-3</code> のように人数をつけると、その人数の部屋として認識されます（例: <code>kazoku-3</code> = 3人部屋）。<br>
-                    通話中に「📝 言伝」で短いメッセージを送れます。全員が読むと自動消去されます。
+                    通話中に「📝 言伝」で短いメッセージを送れます。通話終了までそのまま画面に残ります。
                 </p>
             </div>
 
@@ -878,7 +878,7 @@
                         </div>
                         <p style="font-size: 0.68rem; color: var(--text-muted); margin: 8px 0 0 0; text-align: center; line-height: 1.5;">
                             🔒 P2P直通送信・サーバー保存なし<br>
-                            全員が読んだ言伝は自動で消えます
+                            通話中の言伝はそのまま画面に残ります
                         </p>
                     </div>
                 </div>
@@ -1485,23 +1485,7 @@
                     break;
 
                 case 'delete':
-                    // 全員既読による消去指示
-                    const idx = kotoduteMsgs.findIndex(m => m.id === data.msgId);
-                    if (idx !== -1) {
-                        const el = document.querySelector('[data-msg-id="' + data.msgId + '"]');
-                        if (el) {
-                            el.classList.add('kotodute-fade-out');
-                            setTimeout(() => {
-                                kotoduteMsgs.splice(idx, 1);
-                                saveToLocal();
-                                renderKotoduteList();
-                            }, 600);
-                        } else {
-                            kotoduteMsgs.splice(idx, 1);
-                            saveToLocal();
-                            renderKotoduteList();
-                        }
-                    }
+                    // 通話中は自動消去しない仕様に変更
                     break;
             }
         }
@@ -1575,29 +1559,9 @@
             }
         }
 
-        // 全員既読チェック → 消去
+        // 全員既読チェック（※通話中は自動消去せず、そのまま維持）
         function checkAllRead(msg) {
-            if (msg.readBy.length >= msg.capacity) {
-                // 全員既読！相手にも消去を通知
-                if (dataConnection && dataConnection.open) {
-                    dataConnection.send({
-                        type: 'delete',
-                        msgId: msg.id
-                    });
-                }
-
-                // 自分のリストからもフェードアウト消去
-                const el = document.querySelector('[data-msg-id="' + msg.id + '"]');
-                if (el) {
-                    el.classList.add('kotodute-fade-out');
-                    setTimeout(() => {
-                        const i = kotoduteMsgs.findIndex(m => m.id === msg.id);
-                        if (i !== -1) kotoduteMsgs.splice(i, 1);
-                        saveToLocal();
-                        renderKotoduteList();
-                    }, 600);
-                }
-            }
+            // 通話中は消去せず、じっくり読めるようにそのまま画面に維持します
         }
 
         // 表示リスト更新
