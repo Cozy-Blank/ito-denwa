@@ -733,6 +733,207 @@
             background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
         }
 
+    
+        /* 📋 伝言一覧モーダル＆安否バッジ */
+        .ticker-screen {
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .ticker-screen:hover {
+            border-color: rgba(245, 158, 11, 0.6);
+        }
+
+        .ticker-open-btn {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #fbbf24;
+            font-size: 0.68rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .ticker-open-btn:hover {
+            background: rgba(245, 158, 11, 0.25);
+        }
+
+        /* 🚨 防災・安否クイックボタン */
+        .safety-badge-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+
+        .safety-badge-btn {
+            flex: 1;
+            white-space: nowrap;
+            font-size: 0.72rem;
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-weight: 600;
+            transition: transform 0.1s, opacity 0.2s;
+            box-shadow: none;
+        }
+        .safety-badge-btn:hover {
+            transform: translateY(-1px);
+        }
+        .safety-badge-btn:active {
+            transform: scale(0.97);
+        }
+
+        .badge-safe {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.4);
+            color: #34d399;
+        }
+        .badge-evac {
+            background: rgba(245, 158, 11, 0.15);
+            border-color: rgba(245, 158, 11, 0.4);
+            color: #fbbf24;
+        }
+        .badge-sos {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #f87171;
+        }
+
+        /* 📋 静止一覧モーダル */
+        .ticker-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .ticker-modal-overlay.open {
+            display: flex;
+        }
+
+        .ticker-modal-card {
+            background: #0b1120;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 440px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(245, 158, 11, 0.15);
+            overflow: hidden;
+            animation: modalPop 0.2s ease-out;
+        }
+
+        @keyframes modalPop {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .ticker-modal-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .ticker-modal-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #fbbf24;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .ticker-modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            box-shadow: none;
+            width: auto;
+        }
+        .ticker-modal-close:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .ticker-modal-body {
+            padding: 14px 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .history-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .history-card.type-sos {
+            border-color: rgba(239, 68, 68, 0.5);
+            background: rgba(239, 68, 68, 0.08);
+        }
+        .history-card.type-safe {
+            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.06);
+        }
+        .history-card.type-evac {
+            border-color: rgba(245, 158, 11, 0.4);
+            background: rgba(245, 158, 11, 0.06);
+        }
+
+        .history-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.72rem;
+        }
+        .history-room-tag {
+            color: #38bdf8;
+            font-weight: 600;
+        }
+        .history-time-ago {
+            color: #fbbf24;
+            background: rgba(245, 158, 11, 0.15);
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-size: 0.68rem;
+            font-weight: 600;
+        }
+        .history-card-text {
+            color: #f8fafc;
+            font-size: 0.88rem;
+            line-height: 1.45;
+            word-break: break-word;
+        }
+        .history-empty {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 30px 10px;
+            font-size: 0.85rem;
+        }
+
     </style>
 </head>
 <body>
@@ -762,10 +963,13 @@
                         <span class="blink-dot"></span>
                         BAR 看板電光ニュース
                     </span>
-                    <span class="ticker-count" id="ticker-status-label">広告・伝言板（ホバーで一時停止）</span>
+                    <button type="button" class="ticker-open-btn" onclick="openTickerModal()">
+                        📋 履歴一覧（静止表示）
+                    </button>
                 </div>
                 
-                <div class="ticker-screen">
+                <!-- タップで一覧を開ける電光板 -->
+                <div class="ticker-screen" onclick="openTickerModal()" title="タップして静止一覧を表示">
                     <div class="ticker-track" id="ticker-track">
                         <!-- ここにスクロール文字が流れます -->
                     </div>
@@ -775,6 +979,34 @@
                 <div class="ticker-input-row">
                     <input type="text" id="ticker-input" placeholder="📢 掲示板に広告・伝言を流す..." maxlength="80">
                     <button type="button" onclick="postTickerMessage()">流す</button>
+                </div>
+
+                <!-- 🚨 防災・安否クイックボタン（ワンタップ入力） -->
+                <div class="safety-badge-row">
+                    <button type="button" class="safety-badge-btn badge-safe" onclick="applySafetyBadge('🟢 無事・自宅待機')">
+                        🟢 無事・待機
+                    </button>
+                    <button type="button" class="safety-badge-btn badge-evac" onclick="applySafetyBadge('🟡 避難所へ移動中')">
+                        🟡 避難所へ移動
+                    </button>
+                    <button type="button" class="safety-badge-btn badge-sos" onclick="applySafetyBadge('🔴 要救助・連絡求む')">
+                        🔴 連絡求む(緊急)
+                    </button>
+                </div>
+            </div>
+
+            <!-- 📋 静止した伝言一覧モーダル（過去5件・押し出し式） -->
+            <div class="ticker-modal-overlay" id="ticker-modal" onclick="closeTickerModal(event)">
+                <div class="ticker-modal-card" onclick="event.stopPropagation()">
+                    <div class="ticker-modal-header">
+                        <div class="ticker-modal-title">
+                            📋 伝言履歴（最新5件・押し出し式）
+                        </div>
+                        <button type="button" class="ticker-modal-close" onclick="closeTickerModal()">✕</button>
+                    </div>
+                    <div class="ticker-modal-body" id="ticker-history-list">
+                        <!-- ここに静止カードが並びます -->
+                    </div>
                 </div>
             </div>
 
@@ -1626,6 +1858,72 @@
             }
         });
     
+        
+        // ⏱️ 経過時間（たった今・◯分前・◯時間前）の算出
+        function formatTimeAgo(dateInput) {
+            if (!dateInput) return '';
+            const past = new Date(dateInput).getTime();
+            if (isNaN(past)) return '';
+            const now = Date.now();
+            const diffSec = Math.max(0, Math.floor((now - past) / 1000));
+            if (diffSec < 60) return 'たった今';
+            const diffMin = Math.floor(diffSec / 60);
+            if (diffMin < 60) return diffMin + '分前';
+            const diffHour = Math.floor(diffMin / 60);
+            if (diffHour < 24) return diffHour + '時間前';
+            const diffDay = Math.floor(diffHour / 24);
+            return diffDay + '日前';
+        }
+
+        // 🚨 安否バッジをワンタップで入力枠にセット
+        function applySafetyBadge(text) {
+            const input = document.getElementById('ticker-input');
+            if (!input) return;
+            input.value = text;
+            input.focus();
+        }
+
+        // 📋 静止一覧モーダルを開く
+        function openTickerModal() {
+            const modal = document.getElementById('ticker-modal');
+            const listEl = document.getElementById('ticker-history-list');
+            if (!modal || !listEl) return;
+
+            // 伝言のみ抽出（広告を除く）
+            const realMsgs = tickerMessages.filter(m => m.type === 'msg');
+
+            if (realMsgs.length === 0) {
+                listEl.innerHTML = '<div class="history-empty">📭 まだ伝言はありません<br>「流す」ボタンから伝言や安否情報を残せます</div>';
+            } else {
+                listEl.innerHTML = realMsgs.map(m => {
+                    const timeAgo = m.rawTime ? formatTimeAgo(m.rawTime) : (m.time || '');
+                    let cardClass = 'history-card';
+                    if (m.text.includes('🔴') || m.text.includes('緊急') || m.text.includes('要救助')) cardClass += ' type-sos';
+                    else if (m.text.includes('🟢') || m.text.includes('無事')) cardClass += ' type-safe';
+                    else if (m.text.includes('🟡') || m.text.includes('避難')) cardClass += ' type-evac';
+
+                    return '<div class="' + cardClass + '">' +
+                        '<div class="history-card-header">' +
+                            '<span class="history-room-tag">' + (m.room ? '🏠 ' + escapeHtml(m.room) : '📢 全体') + '</span>' +
+                            '<span class="history-time-ago">' + timeAgo + '</span>' +
+                        '</div>' +
+                        '<div class="history-card-text">' + escapeHtml(m.text) + '</div>' +
+                    '</div>';
+                }).join('');
+            }
+
+            modal.classList.add('open');
+        }
+
+        // 📋 静止一覧モーダルを閉じる
+        function closeTickerModal(event) {
+            if (event && event.target && event.target.id !== 'ticker-modal' && !event.target.classList.contains('ticker-modal-close')) {
+                return;
+            }
+            const modal = document.getElementById('ticker-modal');
+            if (modal) modal.classList.remove('open');
+        }
+
         // 🍸 BAR風 電光掲示板スクリプト（Googleスプレッドシート クラウド看板連携）
         const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbx-NMAotWs1fjj26dRmCm3VP-kp1TyQsNLh0vbqrIXRTcdy-Loc-x77UWmyEaOQFyzs/exec';
 
@@ -1652,20 +1950,21 @@
                         { type: 'ad', text: '【NEWS】通話記録は残りません。安全な直通P2P回線 ───' }
                     ];
 
-                    const cloudMsgs = data.messages.map(m => {
-                        let timeStr = '';
-                        try {
-                            const d = new Date(m.time);
-                            timeStr = d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
-                        } catch (e) {}
+                    // 📌 押し出し式：最新5件だけをキープ
+                    const recentCloud = data.messages.slice(-5);
+                    const cloudMsgs = recentCloud.map(m => {
+                        const timeAgo = formatTimeAgo(m.time);
                         return {
                             type: 'msg',
-                            text: (m.room ? '[' + m.room + '] ' : '') + m.text + (timeStr ? ' (' + timeStr + ')' : ''),
-                            time: timeStr
+                            text: (m.room ? '[' + m.room + '] ' : '') + m.text + (timeAgo ? ' ⏱️' + timeAgo : ''),
+                            rawText: m.text,
+                            room: m.room,
+                            rawTime: m.time,
+                            time: timeAgo
                         };
                     });
 
-                    // 広告とクラウド伝言を合体
+                    // 広告とクラウド伝言を合体（最大5件押し出し）
                     tickerMessages = [...cloudMsgs, ...baseAds];
                     try { localStorage.setItem('ito-ticker-messages', JSON.stringify(tickerMessages)); } catch (e) {}
                     renderTickerTrack();
@@ -1731,13 +2030,19 @@
 
             const newMsg = {
                 type: 'msg',
-                text: (currentRoom ? '[' + currentRoom + '] ' : '') + text,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                text: (currentRoom ? '[' + currentRoom + '] ' : '') + text + ' ⏱️たった今',
+                rawText: text,
+                room: currentRoom,
+                rawTime: new Date().toISOString(),
+                time: 'たった今'
             };
 
-            // まず手元の画面にすぐ流す！
+            // 📌 押し出し式：伝言は最大5件までキープ
             tickerMessages.unshift(newMsg);
-            if (tickerMessages.length > 20) tickerMessages.pop();
+            const msgOnly = tickerMessages.filter(m => m.type === 'msg');
+            const adOnly = tickerMessages.filter(m => m.type === 'ad');
+            if (msgOnly.length > 5) msgOnly.pop();
+            tickerMessages = [...msgOnly, ...adOnly];
             try { localStorage.setItem('ito-ticker-messages', JSON.stringify(tickerMessages)); } catch (e) {}
             renderTickerTrack();
             input.value = '';
