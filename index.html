@@ -653,15 +653,16 @@
         }
 
         .ticker-track {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             white-space: nowrap;
-            padding-left: 100%;
-            animation: tickerScroll 24s linear infinite;
+            animation: tickerScroll 20s linear infinite;
             font-family: 'Courier New', Consolas, monospace;
             font-size: 0.86rem;
             color: #fbbf24;
             text-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
             letter-spacing: 0.05em;
+            will-change: transform;
         }
 
         .ticker-screen:hover .ticker-track {
@@ -670,7 +671,7 @@
 
         @keyframes tickerScroll {
             0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
+            100% { transform: translateX(-50%); }
         }
 
         .ticker-item-ad {
@@ -1036,8 +1037,7 @@
             }
 
             roomInput.value = targetRoom;
-            alert('🎉 QRコードを読み取りました！
-合言葉: ' + targetRoom);
+            alert('🎉 QRコードを読み取りました！\n合言葉: ' + targetRoom);
             
             // 自動で部屋に入る
             joinRoomAs('call');
@@ -1697,11 +1697,13 @@
                 htmlParts.push('<span class="ticker-separator">✦✦✦</span>');
             });
 
-            track.innerHTML = htmlParts.join(' ');
+            // 途切れずにループさせるため2セット並べる
+            const fullContent = htmlParts.join(' ');
+            track.innerHTML = fullContent + ' ' + fullContent;
             
-            // 文字数に合わせてスクロール速度を動的に調整
+            // 文字数に合わせてスクロール速度を調整（見やすいテンポ）
             const totalChars = tickerMessages.reduce((sum, m) => sum + m.text.length, 0);
-            const duration = Math.max(18, Math.round(totalChars * 0.35));
+            const duration = Math.max(15, Math.round(totalChars * 0.4));
             track.style.animationDuration = duration + 's';
         }
 
