@@ -455,6 +455,283 @@
             margin: 10px auto;
             display: block;
         }
+
+        /* 📝 言伝（ことづて）機能 */
+        .kotodute-panel {
+            margin-top: 16px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+        }
+
+        .kotodute-toggle {
+            background: rgba(14, 165, 233, 0.08);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            color: #38bdf8;
+            font-size: 0.82rem;
+            padding: 10px;
+            border-radius: 10px;
+            width: 100%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: none;
+        }
+
+        .kotodute-toggle:hover {
+            background: rgba(14, 165, 233, 0.15);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .kotodute-area {
+            display: none;
+            margin-top: 12px;
+        }
+
+        .kotodute-area.open {
+            display: block;
+        }
+
+        .kotodute-input-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .kotodute-input-row input {
+            flex: 1;
+            margin-bottom: 0;
+            font-size: 0.88rem;
+            padding: 10px 12px;
+        }
+
+        .kotodute-input-row button {
+            width: auto;
+            min-width: 60px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+            box-shadow: none;
+        }
+
+        .kotodute-list {
+            max-height: 260px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .kotodute-msg {
+            background: rgba(14, 165, 233, 0.06);
+            border: 1px solid rgba(14, 165, 233, 0.15);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 0.82rem;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .kotodute-msg .msg-text {
+            color: var(--text-color);
+            word-break: break-word;
+        }
+
+        .kotodute-msg .msg-meta {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .kotodute-msg .msg-read-status {
+            font-size: 0.68rem;
+            padding: 2px 7px;
+            border-radius: 10px;
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .kotodute-msg.all-read {
+            opacity: 0.5;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .kotodute-empty {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            padding: 20px 0;
+            line-height: 1.6;
+        }
+
+        .room-capacity-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: #10b981;
+            margin-left: 6px;
+        }
+
+        .kotodute-fade-out {
+            animation: fadeOutMsg 0.6s ease forwards;
+        }
+
+        @keyframes fadeOutMsg {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.95); height: 0; padding: 0; margin: 0; border: none; overflow: hidden; }
+        }
+    
+        /* 🍸 BAR風 電光掲示板（LEDティッカー）スタイル */
+        .ticker-container {
+            margin: 16px 0 20px 0;
+            background: #090d16;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            border-radius: 12px;
+            padding: 10px 14px;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.1), inset 0 0 10px rgba(0,0,0,0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ticker-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+        }
+
+        .ticker-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #f59e0b;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .ticker-badge .blink-dot {
+            width: 7px;
+            height: 7px;
+            background: #f59e0b;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #f59e0b;
+            animation: tickerBlink 1.2s infinite;
+        }
+
+        @keyframes tickerBlink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.8); }
+        }
+
+        .ticker-count {
+            color: var(--text-muted);
+            font-size: 0.68rem;
+        }
+
+        /* 電光掲示板のスクリーン */
+        .ticker-screen {
+            background: #030712;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 9px 12px;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .ticker-track {
+            display: inline-block;
+            white-space: nowrap;
+            padding-left: 100%;
+            animation: tickerScroll 24s linear infinite;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 0.86rem;
+            color: #fbbf24;
+            text-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+            letter-spacing: 0.05em;
+        }
+
+        .ticker-screen:hover .ticker-track {
+            animation-play-state: paused;
+        }
+
+        @keyframes tickerScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .ticker-item-ad {
+            color: #94a3b8;
+            margin-right: 32px;
+        }
+
+        .ticker-item-msg {
+            color: #38bdf8;
+            text-shadow: 0 0 6px rgba(56, 189, 248, 0.7);
+            font-weight: 600;
+            margin-right: 32px;
+        }
+
+        .ticker-separator {
+            color: #f59e0b;
+            opacity: 0.5;
+            margin-right: 32px;
+        }
+
+        /* 伝言の書き込みバー */
+        .ticker-input-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .ticker-input-row input {
+            flex: 1;
+            margin-bottom: 0;
+            font-size: 0.82rem;
+            padding: 8px 12px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            color: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .ticker-input-row input:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+        }
+
+        .ticker-input-row button {
+            width: auto;
+            min-width: 72px;
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+            cursor: pointer;
+        }
+
+        .ticker-input-row button:hover {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        }
+
     </style>
 </head>
 <body>
@@ -477,6 +754,29 @@
                 </div>
             </div>
 
+            <!-- 🍸 BAR風 電光掲示板（LEDティッカー） -->
+            <div class="ticker-container" id="bar-ticker-container">
+                <div class="ticker-header">
+                    <span class="ticker-badge">
+                        <span class="blink-dot"></span>
+                        BAR 看板電光ニュース
+                    </span>
+                    <span class="ticker-count" id="ticker-status-label">広告・伝言板（ホバーで一時停止）</span>
+                </div>
+                
+                <div class="ticker-screen">
+                    <div class="ticker-track" id="ticker-track">
+                        <!-- ここにスクロール文字が流れます -->
+                    </div>
+                </div>
+
+                <!-- 伝言を流す入力枠 -->
+                <div class="ticker-input-row">
+                    <input type="text" id="ticker-input" placeholder="📢 掲示板に広告・伝言を流す..." maxlength="80">
+                    <button type="button" onclick="postTickerMessage()">流す</button>
+                </div>
+            </div>
+
             <!-- 🔀 モード切り替えタブ -->
             <div class="tab-group" id="mode-tabs">
                 <button type="button" class="tab-btn active" onclick="switchMode('room')">
@@ -491,9 +791,9 @@
             <div id="mode-room-panel">
                 <div class="content-box">
                     <label class="box-label" for="room-input">
-                        家族・仲間で決めた「合言葉」を入力
+                        家族・仲間で決めた「合言葉」を入力 <span id="room-capacity-indicator"></span>
                     </label>
-                    <input type="text" id="room-input" placeholder="例: yamada-sos または ito-kazoku">
+                    <input type="text" id="room-input" placeholder="例: kazoku-3（末尾の数字＝人数）" oninput="detectRoomCapacity()">
                     
                     <!-- 📷 QRコード読み取り＆印刷ボタン -->
                     <div class="qr-action-row" style="display: flex; gap: 8px; margin-bottom: 12px;">
@@ -520,8 +820,9 @@
                 </div>
 
                 <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 4px 16px 4px; line-height: 1.5;">
-                    💡 <strong>災害・緊急時の使い方：</strong><br>
-                    通常の電話やLINEがダウンした際、全員があらかじめ決めた合言葉（例: <code>yamada-sos</code>）を入力して合流できます。
+                    💡 <strong>使い方のヒント：</strong><br>
+                    合言葉の末尾に <code>-3</code> のように人数をつけると、その人数の部屋として認識されます（例: <code>kazoku-3</code> = 3人部屋）。<br>
+                    通話中に「📝 言伝」で短いメッセージを送れます。全員が読むと自動消去されます。
                 </p>
             </div>
 
@@ -558,11 +859,33 @@
                         📵 通話を切る
                     </button>
                 </div>
+                <!-- 📝 言伝（ことづて）パネル -->
+                <div class="kotodute-panel" id="kotodute-panel" style="display: none;">
+                    <button type="button" class="kotodute-toggle" onclick="toggleKotodute()">
+                        📝 言伝（ことづて） <span id="kotodute-badge" style="display:none; background:#f43f5e; color:#fff; font-size:0.65rem; padding:1px 6px; border-radius:10px; margin-left:4px;">0</span>
+                    </button>
+                    <div class="kotodute-area" id="kotodute-area">
+                        <div class="kotodute-input-row">
+                            <input type="text" id="kotodute-input" placeholder="短い言伝を入力..." maxlength="200" style="margin-bottom: 0;">
+                            <button type="button" onclick="sendKotodute()">送る</button>
+                        </div>
+                        <div class="kotodute-list" id="kotodute-list">
+                            <div class="kotodute-empty">
+                                📭 まだ言伝はありません<br>
+                                通話相手に短いメッセージを送れます
+                            </div>
+                        </div>
+                        <p style="font-size: 0.68rem; color: var(--text-muted); margin: 8px 0 0 0; text-align: center; line-height: 1.5;">
+                            🔒 P2P直通送信・サーバー保存なし<br>
+                            全員が読んだ言伝は自動で消えます
+                        </p>
+                    </div>
+                </div>
             </div>
 
             <!-- 🍃 痕跡ゼロ消去通知 -->
             <div id="zero-trace-toast" class="toast">
-                🍃 通話は終了しました。サーバー・端末に通話記録は一切残っていません。
+                🍃 通話は終了しました。音声・言伝すべてのデータがサーバー・端末から完全消去されました。
             </div>
 
             <!-- 📱 スマホホーム画面追加ガイド -->
@@ -797,6 +1120,12 @@
                 }
             });
 
+            // 📝 DataConnection着信（言伝用）
+            peer.on('connection', (conn) => {
+                console.log('📝 Incoming DataConnection');
+                setupDataConnection(conn);
+            });
+
             // 着信検知
             peer.on('call', (call) => {
                 incomingCallObj = call;
@@ -821,7 +1150,8 @@
         // 部屋で待機する
         function joinRoomAs(role) {
             const roomName = roomInput.value.trim();
-            if (!roomName) return alert('合言葉を入力してください（例: yamada-sos）');
+            if (!roomName) return alert('合言葉を入力してください（例: kazoku-3）');
+            detectRoomCapacity(); // 人数認識
 
             const hostPeerId = sanitizeRoomId(roomName);
 
@@ -851,6 +1181,12 @@
             try {
                 const stream = await getLocalStream();
                 currentCall = peer.call(targetId, stream);
+
+                // 📝 言伝用のDataConnectionも同時に確立
+                myMemberId = generateMemberId();
+                const conn = peer.connect(targetId, { reliable: true });
+                setupDataConnection(conn);
+
                 setupCallEvents(currentCall);
             } catch (err) {
                 console.error(err);
@@ -865,6 +1201,7 @@
             p2pStatus.textContent = '接続中...';
 
             try {
+                myMemberId = generateMemberId();
                 const stream = await getLocalStream();
                 currentCall = incomingCallObj;
                 currentCall.answer(stream);
@@ -953,6 +1290,17 @@
             currentCall = null;
             incomingCallObj = null;
 
+            // 📝 言伝データも完全消去（痕跡ゼロ）
+            if (dataConnection) {
+                dataConnection.close();
+                dataConnection = null;
+            }
+            kotoduteMsgs = [];
+            isKotoduteOpen = false;
+            localStorage.removeItem('ito-kotodute');
+            document.getElementById('kotodute-panel').style.display = 'none';
+            document.getElementById('kotodute-area').classList.remove('open');
+
             if (localStream) {
                 localStream.getTracks().forEach(track => track.stop());
                 localStream = null;
@@ -1010,6 +1358,401 @@
 
             initPeer();
         });
+
+        // =============================================
+        // 📐 Step A: 末尾の数字で人数認識
+        // =============================================
+        let roomCapacity = 2; // デフォルト2人
+
+        function detectRoomCapacity() {
+            const name = roomInput.value.trim();
+            const match = name.match(/-(\d+)$/);
+            const indicator = document.getElementById('room-capacity-indicator');
+
+            if (match) {
+                roomCapacity = parseInt(match[1], 10);
+                if (roomCapacity < 2) roomCapacity = 2;
+                if (roomCapacity > 10) roomCapacity = 10;
+                indicator.innerHTML = '<span class="room-capacity-badge">👥 ' + roomCapacity + '人部屋</span>';
+            } else {
+                roomCapacity = 2;
+                indicator.innerHTML = '';
+            }
+        }
+
+        // =============================================
+        // 📝 Step B: 言伝（ことづて）機能
+        // =============================================
+        let dataConnection = null; // PeerJS DataConnection
+        let kotoduteMsgs = [];     // メッセージ一覧
+        let myMemberId = '';       // 自分の識別子（ランダム生成）
+        let isKotoduteOpen = false;
+
+        // 自分の識別子を生成
+        function generateMemberId() {
+            return 'member-' + Math.random().toString(36).substr(2, 6);
+        }
+
+        // 言伝パネルの開閉
+        function toggleKotodute() {
+            isKotoduteOpen = !isKotoduteOpen;
+            const area = document.getElementById('kotodute-area');
+            area.classList.toggle('open', isKotoduteOpen);
+            if (isKotoduteOpen) {
+                // 未読バッジをリセット
+                const badge = document.getElementById('kotodute-badge');
+                badge.style.display = 'none';
+                badge.textContent = '0';
+                // 自分の既読を送信
+                sendReadReceipts();
+            }
+        }
+
+        // DataChannelの接続を確立
+        function setupDataConnection(conn) {
+            dataConnection = conn;
+
+            conn.on('open', () => {
+                console.log('📝 DataChannel opened');
+                // 言伝パネルを表示
+                document.getElementById('kotodute-panel').style.display = 'block';
+            });
+
+            conn.on('data', (data) => {
+                handleKotoduteData(data);
+            });
+
+            conn.on('close', () => {
+                console.log('📝 DataChannel closed');
+                dataConnection = null;
+            });
+
+            conn.on('error', (err) => {
+                console.error('DataChannel error:', err);
+            });
+        }
+
+        // 受信データの処理
+        function handleKotoduteData(data) {
+            if (!data || !data.type) return;
+
+            switch (data.type) {
+                case 'ticker_msg':
+                    if (data.data) {
+                        tickerMessages.push(data.data);
+                        if (tickerMessages.length > 15) tickerMessages.shift();
+                        try { localStorage.setItem('ito-ticker-messages', JSON.stringify(tickerMessages)); } catch (e) {}
+                        renderTickerTrack();
+                    }
+                    break;
+                case 'kotodute':
+                    // 新しい言伝を受信
+                    const msg = {
+                        id: data.id,
+                        text: data.text,
+                        sender: data.sender,
+                        timestamp: data.timestamp,
+                        readBy: [data.sender], // 送信者は既読扱い
+                        capacity: data.capacity || roomCapacity
+                    };
+                    kotoduteMsgs.push(msg);
+                    saveToLocal();
+                    renderKotoduteList();
+
+                    // パネルが閉じていたらバッジ表示
+                    if (!isKotoduteOpen) {
+                        const badge = document.getElementById('kotodute-badge');
+                        const count = parseInt(badge.textContent || '0') + 1;
+                        badge.textContent = count;
+                        badge.style.display = 'inline';
+                    } else {
+                        // 開いている場合は即座に既読送信
+                        sendReadReceipt(data.id);
+                    }
+                    break;
+
+                case 'read':
+                    // 既読通知を受信
+                    const target = kotoduteMsgs.find(m => m.id === data.msgId);
+                    if (target && !target.readBy.includes(data.reader)) {
+                        target.readBy.push(data.reader);
+                        saveToLocal();
+                        renderKotoduteList();
+
+                        // 全員既読チェック
+                        checkAllRead(target);
+                    }
+                    break;
+
+                case 'delete':
+                    // 全員既読による消去指示
+                    const idx = kotoduteMsgs.findIndex(m => m.id === data.msgId);
+                    if (idx !== -1) {
+                        const el = document.querySelector('[data-msg-id="' + data.msgId + '"]');
+                        if (el) {
+                            el.classList.add('kotodute-fade-out');
+                            setTimeout(() => {
+                                kotoduteMsgs.splice(idx, 1);
+                                saveToLocal();
+                                renderKotoduteList();
+                            }, 600);
+                        } else {
+                            kotoduteMsgs.splice(idx, 1);
+                            saveToLocal();
+                            renderKotoduteList();
+                        }
+                    }
+                    break;
+            }
+        }
+
+        // 言伝を送信
+        function sendKotodute() {
+            const input = document.getElementById('kotodute-input');
+            const text = input.value.trim();
+            if (!text) return;
+            if (!dataConnection || !dataConnection.open) {
+                alert('📝 相手との接続が切れています');
+                return;
+            }
+
+            const msg = {
+                id: 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+                text: text,
+                sender: myMemberId,
+                timestamp: Date.now(),
+                readBy: [myMemberId],
+                capacity: roomCapacity
+            };
+
+            // 相手に送信
+            dataConnection.send({
+                type: 'kotodute',
+                id: msg.id,
+                text: msg.text,
+                sender: msg.sender,
+                timestamp: msg.timestamp,
+                capacity: msg.capacity
+            });
+
+            // 自分のリストにも追加
+            kotoduteMsgs.push(msg);
+            saveToLocal();
+            renderKotoduteList();
+
+            input.value = '';
+            input.focus();
+        }
+
+        // 既読を送信（パネルを開いた時）
+        function sendReadReceipts() {
+            if (!dataConnection || !dataConnection.open) return;
+            kotoduteMsgs.forEach(msg => {
+                if (!msg.readBy.includes(myMemberId)) {
+                    sendReadReceipt(msg.id);
+                    msg.readBy.push(myMemberId);
+                }
+            });
+            saveToLocal();
+            renderKotoduteList();
+        }
+
+        // 個別既読通知を送信
+        function sendReadReceipt(msgId) {
+            if (!dataConnection || !dataConnection.open) return;
+            dataConnection.send({
+                type: 'read',
+                msgId: msgId,
+                reader: myMemberId
+            });
+
+            // ローカルにも反映
+            const msg = kotoduteMsgs.find(m => m.id === msgId);
+            if (msg && !msg.readBy.includes(myMemberId)) {
+                msg.readBy.push(myMemberId);
+                saveToLocal();
+                checkAllRead(msg);
+            }
+        }
+
+        // 全員既読チェック → 消去
+        function checkAllRead(msg) {
+            if (msg.readBy.length >= msg.capacity) {
+                // 全員既読！相手にも消去を通知
+                if (dataConnection && dataConnection.open) {
+                    dataConnection.send({
+                        type: 'delete',
+                        msgId: msg.id
+                    });
+                }
+
+                // 自分のリストからもフェードアウト消去
+                const el = document.querySelector('[data-msg-id="' + msg.id + '"]');
+                if (el) {
+                    el.classList.add('kotodute-fade-out');
+                    setTimeout(() => {
+                        const i = kotoduteMsgs.findIndex(m => m.id === msg.id);
+                        if (i !== -1) kotoduteMsgs.splice(i, 1);
+                        saveToLocal();
+                        renderKotoduteList();
+                    }, 600);
+                }
+            }
+        }
+
+        // 表示リスト更新
+        function renderKotoduteList() {
+            const listEl = document.getElementById('kotodute-list');
+
+            if (kotoduteMsgs.length === 0) {
+                listEl.innerHTML = '<div class="kotodute-empty">📭 まだ言伝はありません<br>通話相手に短いメッセージを送れます</div>';
+                return;
+            }
+
+            listEl.innerHTML = kotoduteMsgs.map(msg => {
+                const isMe = msg.sender === myMemberId;
+                const time = new Date(msg.timestamp);
+                const timeStr = time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0');
+                const readCount = msg.readBy.length;
+                const allRead = readCount >= msg.capacity;
+                const senderLabel = isMe ? '自分' : '相手';
+
+                return '<div class="kotodute-msg' + (allRead ? ' all-read' : '') + '" data-msg-id="' + msg.id + '">' +
+                    '<div class="msg-text">' + escapeHtml(msg.text) + '</div>' +
+                    '<div class="msg-meta">' +
+                        '<span>' + senderLabel + ' · ' + timeStr + '</span>' +
+                        '<span class="msg-read-status">' +
+                            (allRead ? '✅ 全員既読' : '👁 ' + readCount + '/' + msg.capacity + '人既読') +
+                        '</span>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        // HTMLエスケープ
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // IndexedDB代わりにlocalStorageで簡易保存（通話中のみ使用）
+        function saveToLocal() {
+            try {
+                localStorage.setItem('ito-kotodute', JSON.stringify(kotoduteMsgs));
+            } catch (e) {}
+        }
+
+        function loadFromLocal() {
+            try {
+                const saved = localStorage.getItem('ito-kotodute');
+                if (saved) {
+                    kotoduteMsgs = JSON.parse(saved);
+                }
+            } catch (e) {
+                kotoduteMsgs = [];
+            }
+        }
+
+        // Enterキーで送信
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.activeElement && document.activeElement.id === 'kotodute-input') {
+                e.preventDefault();
+                sendKotodute();
+            }
+        });
+    
+        // 🍸 BAR風 電光掲示板スクリプト
+        let tickerMessages = [
+            { type: 'ad', text: '【BAR 意図電話】どなた様もご自由に。秘密の会話は合言葉ルームでどうぞ ───' },
+            { type: 'ad', text: '【NEWS】糸電話方式だからサーバーに通話記録は一切残りません ───' }
+        ];
+
+        // ローカルストレージから読み込み
+        function loadTickerMessages() {
+            try {
+                const saved = localStorage.getItem('ito-ticker-messages');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        tickerMessages = parsed;
+                    }
+                }
+            } catch (e) {}
+            renderTickerTrack();
+        }
+
+        // 電光掲示板の文字を描画
+        function renderTickerTrack() {
+            const track = document.getElementById('ticker-track');
+            if (!track) return;
+
+            let htmlParts = [];
+            tickerMessages.forEach((msg, idx) => {
+                if (msg.type === 'msg') {
+                    htmlParts.push('<span class="ticker-item-msg">💬 ' + escapeHtml(msg.text) + '</span>');
+                } else {
+                    htmlParts.push('<span class="ticker-item-ad">' + escapeHtml(msg.text) + '</span>');
+                }
+                htmlParts.push('<span class="ticker-separator">✦✦✦</span>');
+            });
+
+            track.innerHTML = htmlParts.join(' ');
+            
+            // 文字数に合わせてスクロール速度を動的に調整
+            const totalChars = tickerMessages.reduce((sum, m) => sum + m.text.length, 0);
+            const duration = Math.max(18, Math.round(totalChars * 0.35));
+            track.style.animationDuration = duration + 's';
+        }
+
+        // 伝言を流す（投稿）
+        function postTickerMessage() {
+            const input = document.getElementById('ticker-input');
+            if (!input) return;
+            const text = input.value.trim();
+            if (!text) return;
+
+            const newMsg = {
+                type: 'msg',
+                text: text,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            tickerMessages.push(newMsg);
+            
+            // 最大15件まで保持
+            if (tickerMessages.length > 15) {
+                tickerMessages.shift();
+            }
+
+            try {
+                localStorage.setItem('ito-ticker-messages', JSON.stringify(tickerMessages));
+            } catch (e) {}
+
+            renderTickerTrack();
+
+            // P2P通信中の相手がいる場合は、相手の電光掲示板にも同時に流す！
+            if (typeof dataConnection !== 'undefined' && dataConnection && dataConnection.open) {
+                dataConnection.send({
+                    type: 'ticker_msg',
+                    data: newMsg
+                });
+            }
+
+            input.value = '';
+        }
+
+        // Enterキーで投稿
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.activeElement && document.activeElement.id === 'ticker-input') {
+                e.preventDefault();
+                postTickerMessage();
+            }
+        });
+
+        // ページ読み込み時に初期化
+        loadTickerMessages();
+
     </script>
 </body>
 </html>
