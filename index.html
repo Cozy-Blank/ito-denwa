@@ -1662,13 +1662,58 @@
             }
         });
     
-        // 🍸 BAR風 電光掲示板スクリプト
+        // 🍸 BAR風 電光掲示板スクリプト（Googleスプレッドシート クラウド看板連携）
+        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbx-NMAotWs1fjj26dRmCm3VP-kp1TyQsNLh0vbqrIXRTcdy-Loc-x77UWmyEaOQFyzs/exec';
+
         let tickerMessages = [
             { type: 'ad', text: '【BAR 意図電話】どなた様もご自由に。秘密の会話は合言葉ルームでどうぞ ───' },
             { type: 'ad', text: '【NEWS】糸電話方式だからサーバーに通話記録は一切残りません ───' }
         ];
 
-        // ローカルストレージから読み込み
+        // クラウド（スプレッドシート）から伝言を取得
+        async function fetchTickerFromCloud(roomName) {
+            const label = document.getElementById('ticker-status-label');
+            const targetRoom = roomName || (document.getElementById('room-input') ? document.getElementById('room-input').value.trim() : '');
+            
+            try {
+                if (label) label.textContent = '📡 看板更新中...';
+                const url = GAS_API_URL + '?room=' + encodeURIComponent(targetRoom);
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                if (data && data.status === 'ok' && Array.isArray(data.messages)) {
+                    // 基本広告
+                    const baseAds = [
+                        { type: 'ad', text: '【BAR 意図電話】秘密の会話は合言葉ルームでどうぞ ───' },
+                        { type: 'ad', text: '【NEWS】通話記録は残りません。安全な直通P2P回線 ───' }
+                    ];
+
+                    const cloudMsgs = data.messages.map(m => {
+                        let timeStr = '';
+                        try {
+                            const d = new Date(m.time);
+                            timeStr = d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+                        } catch (e) {}
+                        return {
+                            type: 'msg',
+                            text: (m.room ? '[' + m.room + '] ' : '') + m.text + (timeStr ? ' (' + timeStr + ')' : ''),
+                            time: timeStr
+                        };
+                    });
+
+                    // 広告とクラウド伝言を合体
+                    tickerMessages = [...cloudMsgs, ...baseAds];
+                    try { localStorage.setItem('ito-ticker-messages', JSON.stringify(tickerMessages)); } catch (e) {}
+                    renderTickerTrack();
+                    if (label) label.textContent = '広告・伝言板（ホバーで一時停止）';
+                }
+            } catch (err) {
+                console.log('クラウド看板取得エラー:', err);
+                if (label) label.textContent = '広告・伝言板（ホバーで一時停止）';
+            }
+        }
+
+        // ローカルストレージから読み込み（初期表示用）
         function loadTickerMessages() {
             try {
                 const saved = localStorage.getItem('ito-ticker-messages');
@@ -1680,6 +1725,9 @@
                 }
             } catch (e) {}
             renderTickerTrack();
+
+            // クラウドからも最新データを取得
+            fetchTickerFromCloud();
         }
 
         // 電光掲示板の文字を描画
@@ -1701,39 +1749,36 @@
             const fullContent = htmlParts.join(' ');
             track.innerHTML = fullContent + ' ' + fullContent;
             
-            // 文字数に合わせてスクロール速度を調整（見やすいテンポ）
+            // 文字数に合わせてスクロール速度を調整
             const totalChars = tickerMessages.reduce((sum, m) => sum + m.text.length, 0);
             const duration = Math.max(15, Math.round(totalChars * 0.4));
             track.style.animationDuration = duration + 's';
         }
 
         // 伝言を流す（投稿）
-        function postTickerMessage() {
+        async function postTickerMessage() {
             const input = document.getElementById('ticker-input');
             if (!input) return;
             const text = input.value.trim();
             if (!text) return;
 
+            const roomInput = document.getElementById('room-input');
+            const currentRoom = roomInput ? roomInput.value.trim() : '';
+
             const newMsg = {
                 type: 'msg',
-                text: text,
+                text: (currentRoom ? '[' + currentRoom + '] ' : '') + text,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
 
-            tickerMessages.push(newMsg);
-            
-            // 最大15件まで保持
-            if (tickerMessages.length > 15) {
-                tickerMessages.shift();
-            }
-
-            try {
-                localStorage.setItem('ito-ticker-messages', JSON.stringify(tickerMessages));
-            } catch (e) {}
-
+            // まず手元の画面にすぐ流す！
+            tickerMessages.unshift(newMsg);
+            if (tickerMessages.length > 20) tickerMessages.pop();
+            try { localStorage.setItem('ito-ticker-messages', JSON.stringify(tickerMessages)); } catch (e) {}
             renderTickerTrack();
+            input.value = '';
 
-            // P2P通信中の相手がいる場合は、相手の電光掲示板にも同時に流す！
+            // P2P通話相手がいれば直接も送信
             if (typeof dataConnection !== 'undefined' && dataConnection && dataConnection.open) {
                 dataConnection.send({
                     type: 'ticker_msg',
@@ -1741,7 +1786,13 @@
                 });
             }
 
-            input.value = '';
+            // ☁️ スプレッドシート（クラウド看板）にも送信・保存！
+            try {
+                const postUrl = GAS_API_URL + '?action=post&room=' + encodeURIComponent(currentRoom) + '&text=' + encodeURIComponent(text);
+                fetch(postUrl, { mode: 'no-cors' }).catch(() => {});
+            } catch (e) {
+                console.log('スプレッドシート投稿エラー:', e);
+            }
         }
 
         // Enterキーで投稿
@@ -1754,6 +1805,7 @@
 
         // ページ読み込み時に初期化
         loadTickerMessages();
+        setInterval(() => fetchTickerFromCloud(), 20000);
 
     </script>
 </body>
