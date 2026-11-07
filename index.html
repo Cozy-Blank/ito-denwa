@@ -593,6 +593,51 @@
         }
     
         /* ⚡️ 近未来サイバーLED看板スタイル（横1行・電光スクリーン最大化） */
+        
+        /* 🏷️ マイ合言葉チップ（部屋別ワンタップ切り替えバー） */
+        .my-rooms-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 7px;
+            margin-bottom: 7px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.12);
+            scrollbar-width: none;
+        }
+        .my-rooms-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .room-chip {
+            white-space: nowrap;
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: none;
+        }
+        .room-chip:hover {
+            border-color: rgba(0, 240, 255, 0.4);
+            color: #e0f2fe;
+            transform: translateY(-1px);
+        }
+        .room-chip.active {
+            background: rgba(0, 240, 255, 0.16);
+            border-color: #00f0ff;
+            color: #00f0ff;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+            text-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
+        }
+
         .cyber-ticker-card {
             margin: 14px 0 18px 0;
             background: linear-gradient(180deg, #060913 0%, #03060f 100%);
@@ -1047,6 +1092,10 @@
 
             <!-- 🍸 BAR風 電光掲示板（LEDティッカー） -->
             <div class="cyber-ticker-card" id="bar-ticker-container">
+                <!-- 🏷️ マイ合言葉チップ（部屋別ワンタップ切り替え） -->
+                <div class="my-rooms-bar" id="my-rooms-bar">
+                    <!-- ここに部屋チップが自動生成されます -->
+                </div>
                 <!-- ⚡️ 電光看板（横幅最大化）＋ 右端コンパクト履歴ボタン（横1行） -->
                 <div class="cyber-ticker-row">
                     <div class="cyber-screen" onclick="openTickerModal()" title="タップして静止一覧を表示">
@@ -1473,6 +1522,7 @@
             if (!roomName) return alert('合言葉を入力してください（例: kazoku-3）');
             detectRoomCapacity(); // 人数認識
 
+            saveMyRoom(roomName);
             const hostPeerId = sanitizeRoomId(roomName);
 
             if (role === 'wait') {
@@ -1843,8 +1893,10 @@
             kotoduteMsgs.push(msg);
             saveToLocal();
             renderKotoduteList();
+            saveMyRoom(currentRoom);
 
             input.value = '';
+            if (currentRoom) saveMyRoom(currentRoom);
             input.focus();
         }
 
@@ -2019,6 +2071,63 @@
             if (modal) modal.classList.remove('open');
         }
 
+        
+        // =============================================
+        // 🏷️ マイ合言葉チップ（部屋別ワンタップ切り替え）
+        // =============================================
+        let myRooms = ['kazoku-3']; // 初期プリセット
+        let currentFilterRoom = '';  // '' は全体
+
+        function loadMyRooms() {
+            try {
+                const saved = localStorage.getItem('ito-my-rooms');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        myRooms = parsed;
+                    }
+                }
+            } catch (e) {}
+            renderRoomChips();
+        }
+
+        function saveMyRoom(roomName) {
+            if (!roomName) return;
+            const clean = roomName.trim();
+            if (!clean) return;
+            if (!myRooms.includes(clean)) {
+                myRooms.push(clean);
+                if (myRooms.length > 8) myRooms.shift();
+                try { localStorage.setItem('ito-my-rooms', JSON.stringify(myRooms)); } catch (e) {}
+                renderRoomChips();
+            }
+        }
+
+        function selectRoomChip(roomName) {
+            currentFilterRoom = roomName || '';
+            const roomInput = document.getElementById('room-input');
+            if (roomInput && roomName) {
+                roomInput.value = roomName;
+                detectRoomCapacity();
+            }
+            renderRoomChips();
+            fetchTickerFromCloud(currentFilterRoom);
+        }
+
+        function renderRoomChips() {
+            const bar = document.getElementById('my-rooms-bar');
+            if (!bar) return;
+
+            let html = '<button type="button" class="room-chip' + (currentFilterRoom === '' ? ' active' : '') + '" onclick="selectRoomChip(\'\')">📢 すべて</button>';
+
+            myRooms.forEach(room => {
+                const isActive = (currentFilterRoom.toLowerCase() === room.toLowerCase());
+                html += '<button type="button" class="room-chip' + (isActive ? ' active' : '') + '" onclick="selectRoomChip(\'' + escapeHtml(room) + '\')">🏠 ' + escapeHtml(room) + '</button>';
+            });
+
+            bar.innerHTML = html;
+        }
+
         // 🍸 BAR風 電光掲示板スクリプト（Googleスプレッドシート クラウド看板連携）
         const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbx-NMAotWs1fjj26dRmCm3VP-kp1TyQsNLh0vbqrIXRTcdy-Loc-x77UWmyEaOQFyzs/exec';
 
@@ -2178,6 +2287,7 @@
 
         // ページ読み込み時に初期化
         loadTickerMessages();
+        loadMyRooms();
         setInterval(() => fetchTickerFromCloud(), 20000);
 
     </script>
