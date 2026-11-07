@@ -592,76 +592,99 @@
             100% { opacity: 0; transform: scale(0.95); height: 0; padding: 0; margin: 0; border: none; overflow: hidden; }
         }
     
-        /* 🍸 BAR風 電光掲示板（LEDティッカー）スタイル */
+        /* ✨ 洗練された看板電光ニュース（モダン・スマートデザイン） */
         .ticker-container {
             margin: 16px 0 20px 0;
-            background: #090d16;
-            border: 1px solid rgba(245, 158, 11, 0.35);
-            border-radius: 12px;
-            padding: 10px 14px;
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.1), inset 0 0 10px rgba(0,0,0,0.8);
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.7) 0%, rgba(10, 15, 30, 0.88) 100%);
+            border: 1px solid rgba(56, 189, 248, 0.18);
+            border-radius: 14px;
+            padding: 12px 14px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
             position: relative;
-            overflow: hidden;
         }
 
         .ticker-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 0.72rem;
-            letter-spacing: 0.08em;
+            margin-bottom: 9px;
+            padding: 0 2px;
         }
 
         .ticker-badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            color: #f59e0b;
-            font-weight: 700;
-            text-transform: uppercase;
+            gap: 7px;
+            color: #e2e8f0;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
         }
 
         .ticker-badge .blink-dot {
             width: 7px;
             height: 7px;
-            background: #f59e0b;
+            background: #38bdf8;
             border-radius: 50%;
-            box-shadow: 0 0 8px #f59e0b;
-            animation: tickerBlink 1.2s infinite;
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
+            animation: tickerBlink 1.8s infinite ease-in-out;
         }
 
         @keyframes tickerBlink {
             0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 0.35; transform: scale(0.85); }
         }
 
-        .ticker-count {
-            color: var(--text-muted);
-            font-size: 0.68rem;
+        .ticker-open-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #94a3b8;
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+            box-shadow: none;
         }
 
-        /* 電光掲示板のスクリーン */
+        .ticker-open-btn:hover {
+            background: rgba(56, 189, 248, 0.12);
+            border-color: rgba(56, 189, 248, 0.3);
+            color: #38bdf8;
+            transform: translateY(-1px);
+        }
+
+        /* スクリーン */
         .ticker-screen {
-            background: #030712;
+            background: rgba(3, 7, 18, 0.82);
             border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 9px 12px;
             overflow: hidden;
             white-space: nowrap;
             position: relative;
+            cursor: pointer;
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+
+        .ticker-screen:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.1);
         }
 
         .ticker-track {
             display: inline-flex;
             align-items: center;
             white-space: nowrap;
-            animation: tickerScroll 20s linear infinite;
-            font-family: 'Courier New', Consolas, monospace;
-            font-size: 0.86rem;
-            color: #fbbf24;
-            text-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
-            letter-spacing: 0.05em;
+            animation: tickerScroll 22s linear infinite;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+            font-size: 0.83rem;
+            color: #f1f5f9;
+            letter-spacing: 0.03em;
             will-change: transform;
         }
 
@@ -676,23 +699,26 @@
 
         .ticker-item-ad {
             color: #94a3b8;
-            margin-right: 32px;
+            margin-right: 28px;
+            font-weight: 400;
         }
 
         .ticker-item-msg {
             color: #38bdf8;
-            text-shadow: 0 0 6px rgba(56, 189, 248, 0.7);
-            font-weight: 600;
-            margin-right: 32px;
+            font-weight: 500;
+            margin-right: 28px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .ticker-separator {
-            color: #f59e0b;
-            opacity: 0.5;
-            margin-right: 32px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-right: 28px;
+            font-size: 0.75rem;
         }
 
-        /* 伝言の書き込みバー */
+        /* メッセージ入力行 */
         .ticker-input-row {
             display: flex;
             gap: 8px;
@@ -703,87 +729,65 @@
             flex: 1;
             margin-bottom: 0;
             font-size: 0.82rem;
-            padding: 8px 12px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(245, 158, 11, 0.25);
+            padding: 9px 12px;
+            background: rgba(3, 7, 18, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: #f8fafc;
-            border-radius: 8px;
+            border-radius: 9px;
+            transition: all 0.2s ease;
         }
 
         .ticker-input-row input:focus {
-            border-color: #f59e0b;
-            box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+            background: rgba(3, 7, 18, 0.85);
         }
 
         .ticker-input-row button {
             width: auto;
-            min-width: 72px;
-            padding: 8px 14px;
+            min-width: 68px;
+            padding: 9px 14px;
             font-size: 0.8rem;
             font-weight: 600;
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: #000;
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: #ffffff;
             border: none;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+            border-radius: 9px;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.25);
             cursor: pointer;
+            transition: all 0.2s ease;
         }
 
         .ticker-input-row button:hover {
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.35);
         }
 
-    
-        /* 📋 伝言一覧モーダル＆安否バッジ */
-        .ticker-screen {
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-        .ticker-screen:hover {
-            border-color: rgba(245, 158, 11, 0.6);
-        }
-
-        .ticker-open-btn {
-            background: rgba(245, 158, 11, 0.12);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            color: #fbbf24;
-            font-size: 0.68rem;
-            padding: 3px 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .ticker-open-btn:hover {
-            background: rgba(245, 158, 11, 0.25);
-        }
-
-        /* 🚨 防災・安否クイックボタン */
+        /* 🚨 防災・安否クイックボタン（洗練されたピルスタイル） */
         .safety-badge-row {
             display: flex;
             gap: 6px;
             margin-top: 8px;
-            overflow-x: auto;
-            padding-bottom: 2px;
         }
 
         .safety-badge-btn {
             flex: 1;
             white-space: nowrap;
             font-size: 0.72rem;
-            padding: 6px 8px;
-            border-radius: 8px;
+            padding: 6px 6px;
+            border-radius: 20px;
             border: 1px solid transparent;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 4px;
-            font-weight: 600;
-            transition: transform 0.1s, opacity 0.2s;
+            font-weight: 500;
+            transition: all 0.15s ease;
             box-shadow: none;
         }
+
         .safety-badge-btn:hover {
             transform: translateY(-1px);
         }
@@ -792,28 +796,42 @@
         }
 
         .badge-safe {
-            background: rgba(16, 185, 129, 0.15);
-            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.25);
             color: #34d399;
         }
-        .badge-evac {
-            background: rgba(245, 158, 11, 0.15);
-            border-color: rgba(245, 158, 11, 0.4);
-            color: #fbbf24;
-        }
-        .badge-sos {
-            background: rgba(239, 68, 68, 0.15);
-            border-color: rgba(239, 68, 68, 0.4);
-            color: #f87171;
+        .badge-safe:hover {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.4);
         }
 
-        /* 📋 静止一覧モーダル */
+        .badge-evac {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.25);
+            color: #fbbf24;
+        }
+        .badge-evac:hover {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: rgba(245, 158, 11, 0.4);
+        }
+
+        .badge-sos {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.25);
+            color: #f87171;
+        }
+        .badge-sos:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        /* 📋 洗練された静止一覧モーダル */
         .ticker-modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(4px);
+            background: rgba(3, 7, 18, 0.8);
+            backdrop-filter: blur(6px);
             z-index: 9999;
             align-items: center;
             justify-content: center;
@@ -824,26 +842,26 @@
         }
 
         .ticker-modal-card {
-            background: #0b1120;
-            border: 1px solid rgba(245, 158, 11, 0.4);
+            background: #0b1329;
+            border: 1px solid rgba(56, 189, 248, 0.25);
             border-radius: 16px;
             width: 100%;
             max-width: 440px;
             max-height: 85vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(245, 158, 11, 0.15);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.1);
             overflow: hidden;
-            animation: modalPop 0.2s ease-out;
+            animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @keyframes modalPop {
-            0% { transform: scale(0.95); opacity: 0; }
+            0% { transform: scale(0.96); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
 
         .ticker-modal-header {
-            padding: 14px 16px;
+            padding: 14px 18px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             align-items: center;
@@ -851,26 +869,27 @@
         }
         .ticker-modal-title {
             font-size: 0.92rem;
-            font-weight: 700;
-            color: #fbbf24;
+            font-weight: 600;
+            color: #f1f5f9;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
         .ticker-modal-close {
             background: transparent;
             border: none;
-            color: var(--text-muted);
+            color: #94a3b8;
             font-size: 1.2rem;
             cursor: pointer;
             padding: 4px 8px;
             border-radius: 6px;
             box-shadow: none;
             width: auto;
+            transition: color 0.15s;
         }
         .ticker-modal-close:hover {
             color: #fff;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .ticker-modal-body {
@@ -882,25 +901,25 @@
         }
 
         .history-card {
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            padding: 12px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 11px;
+            padding: 12px 14px;
             display: flex;
             flex-direction: column;
             gap: 6px;
         }
         .history-card.type-sos {
-            border-color: rgba(239, 68, 68, 0.5);
-            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.35);
+            background: rgba(239, 68, 68, 0.06);
         }
         .history-card.type-safe {
-            border-color: rgba(16, 185, 129, 0.4);
-            background: rgba(16, 185, 129, 0.06);
+            border-color: rgba(16, 185, 129, 0.3);
+            background: rgba(16, 185, 129, 0.05);
         }
         .history-card.type-evac {
-            border-color: rgba(245, 158, 11, 0.4);
-            background: rgba(245, 158, 11, 0.06);
+            border-color: rgba(245, 158, 11, 0.3);
+            background: rgba(245, 158, 11, 0.05);
         }
 
         .history-card-header {
@@ -911,20 +930,20 @@
         }
         .history-room-tag {
             color: #38bdf8;
-            font-weight: 600;
+            font-weight: 500;
         }
         .history-time-ago {
-            color: #fbbf24;
-            background: rgba(245, 158, 11, 0.15);
-            padding: 2px 7px;
-            border-radius: 10px;
+            color: #94a3b8;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 8px;
+            border-radius: 12px;
             font-size: 0.68rem;
-            font-weight: 600;
+            font-weight: 500;
         }
         .history-card-text {
             color: #f8fafc;
             font-size: 0.88rem;
-            line-height: 1.45;
+            line-height: 1.5;
             word-break: break-word;
         }
         .history-empty {
@@ -961,7 +980,7 @@
                 <div class="ticker-header">
                     <span class="ticker-badge">
                         <span class="blink-dot"></span>
-                        BAR 看板電光ニュース
+                        看板電光ニュース
                     </span>
                     <button type="button" class="ticker-open-btn" onclick="openTickerModal()">
                         📋 履歴一覧（静止表示）
@@ -977,7 +996,7 @@
 
                 <!-- 伝言を流す入力枠 -->
                 <div class="ticker-input-row">
-                    <input type="text" id="ticker-input" placeholder="📢 掲示板に広告・伝言を流す..." maxlength="80">
+                    <input type="text" id="ticker-input" placeholder="📢 掲示板にメッセージを流す..." maxlength="80">
                     <button type="button" onclick="postTickerMessage()">流す</button>
                 </div>
 
@@ -1092,25 +1111,25 @@
                         📵 通話を切る
                     </button>
                 </div>
-                <!-- 📝 言伝（ことづて）パネル -->
+                <!-- 💬 メッセージ送信パネル -->
                 <div class="kotodute-panel" id="kotodute-panel" style="display: none;">
                     <button type="button" class="kotodute-toggle" onclick="toggleKotodute()">
-                        📝 言伝（ことづて） <span id="kotodute-badge" style="display:none; background:#f43f5e; color:#fff; font-size:0.65rem; padding:1px 6px; border-radius:10px; margin-left:4px;">0</span>
+                        💬 メッセージを送る <span id="kotodute-badge" style="display:none; background:#f43f5e; color:#fff; font-size:0.65rem; padding:1px 6px; border-radius:10px; margin-left:4px;">0</span>
                     </button>
                     <div class="kotodute-area" id="kotodute-area">
                         <div class="kotodute-input-row">
-                            <input type="text" id="kotodute-input" placeholder="短い言伝を入力..." maxlength="200" style="margin-bottom: 0;">
-                            <button type="button" onclick="sendKotodute()">送る</button>
+                            <input type="text" id="kotodute-input" placeholder="メッセージを入力..." maxlength="200" style="margin-bottom: 0;">
+                            <button type="button" onclick="sendKotodute()">送信</button>
                         </div>
                         <div class="kotodute-list" id="kotodute-list">
                             <div class="kotodute-empty">
-                                📭 まだ言伝はありません<br>
-                                通話相手に短いメッセージを送れます
+                                📭 まだメッセージはありません<br>
+                                通話相手に直接メッセージを送れます
                             </div>
                         </div>
                         <p style="font-size: 0.68rem; color: var(--text-muted); margin: 8px 0 0 0; text-align: center; line-height: 1.5;">
                             🔒 P2P直通送信・サーバー保存なし<br>
-                            通話中の言伝はそのまま画面に残ります
+                            通話中のメッセージはそのまま画面に残ります
                         </p>
                     </div>
                 </div>
@@ -1801,7 +1820,7 @@
             const listEl = document.getElementById('kotodute-list');
 
             if (kotoduteMsgs.length === 0) {
-                listEl.innerHTML = '<div class="kotodute-empty">📭 まだ言伝はありません<br>通話相手に短いメッセージを送れます</div>';
+                listEl.innerHTML = '<div class="kotodute-empty">📭 まだメッセージはありません<br>通話相手に直接メッセージを送れます</div>';
                 return;
             }
 
@@ -1928,7 +1947,7 @@
         const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbx-NMAotWs1fjj26dRmCm3VP-kp1TyQsNLh0vbqrIXRTcdy-Loc-x77UWmyEaOQFyzs/exec';
 
         let tickerMessages = [
-            { type: 'ad', text: '【BAR 意図電話】どなた様もご自由に。秘密の会話は合言葉ルームでどうぞ ───' },
+            { type: 'ad', text: '【意図電話】秘密の通話と伝言は合言葉ルームでどうぞ ───' },
             { type: 'ad', text: '【NEWS】糸電話方式だからサーバーに通話記録は一切残りません ───' }
         ];
 
@@ -1946,7 +1965,7 @@
                 if (data && data.status === 'ok' && Array.isArray(data.messages)) {
                     // 基本広告
                     const baseAds = [
-                        { type: 'ad', text: '【BAR 意図電話】秘密の会話は合言葉ルームでどうぞ ───' },
+                        { type: 'ad', text: '【意図電話】通話とメッセージは合言葉ルームでどうぞ ───' },
                         { type: 'ad', text: '【NEWS】通話記録は残りません。安全な直通P2P回線 ───' }
                     ];
 
