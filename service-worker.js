@@ -1,5 +1,5 @@
 // 意図電話 Service Worker (PWAインストール対応)
-const CACHE_NAME = 'ito-denwa-v5';
+const CACHE_NAME = 'ito-denwa-v6';
 const urlsToCache = [
   '/',
   '/index.html',
