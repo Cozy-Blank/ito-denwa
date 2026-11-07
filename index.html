@@ -1971,36 +1971,43 @@
             input.focus();
         }
 
-        // 📋 静止一覧モーダルを開く
+        // 📋 静止一覧モーダルを開く（エラー回避・完全安全版）
         function openTickerModal() {
-            const modal = document.getElementById('ticker-modal');
-            const listEl = document.getElementById('ticker-history-list');
-            if (!modal || !listEl) return;
+            try {
+                const modal = document.getElementById('ticker-modal');
+                const listEl = document.getElementById('ticker-history-list');
+                if (!modal || !listEl) return;
 
-            // 伝言のみ抽出（広告を除く）
-            const realMsgs = tickerMessages.filter(m => m.type === 'msg');
+                // 伝言のみ抽出（広告を除く）
+                const realMsgs = tickerMessages.filter(m => m && m.type === 'msg');
 
-            if (realMsgs.length === 0) {
-                listEl.innerHTML = '<div class="history-empty">📭 まだ伝言はありません<br>「流す」ボタンから伝言や安否情報を残せます</div>';
-            } else {
-                listEl.innerHTML = realMsgs.map(m => {
-                    const timeAgo = m.rawTime ? formatTimeAgo(m.rawTime) : (m.timeAgo ? m.timeAgo.replace(/[()]/g, '') : '');
-                    let cardClass = 'history-card';
-                    if (m.text.includes('🔴') || m.text.includes('緊急') || m.text.includes('要救助')) cardClass += ' type-sos';
-                    else if (m.text.includes('🟢') || m.text.includes('無事')) cardClass += ' type-safe';
-                    else if (m.text.includes('🟡') || m.text.includes('避難')) cardClass += ' type-evac';
+                if (realMsgs.length === 0) {
+                    listEl.innerHTML = '<div class="history-empty">📭 まだ伝言はありません<br>「流す」ボタンから伝言や安否情報を残せます</div>';
+                } else {
+                    listEl.innerHTML = realMsgs.map(m => {
+                        const txt = m.rawText || m.text || '';
+                        const timeAgo = m.rawTime ? formatTimeAgo(m.rawTime) : (m.timeAgo ? m.timeAgo.replace(/[()]/g, '') : (m.time || 'たった今'));
+                        let cardClass = 'history-card';
+                        if (txt.includes('🔴') || txt.includes('緊急') || txt.includes('要救助')) cardClass += ' type-sos';
+                        else if (txt.includes('🟢') || txt.includes('無事')) cardClass += ' type-safe';
+                        else if (txt.includes('🟡') || txt.includes('避難')) cardClass += ' type-evac';
 
-                    return '<div class="' + cardClass + '">' +
-                        '<div class="history-card-header">' +
-                            '<span class="history-room-tag">' + (m.room ? '🏠 ' + escapeHtml(m.room) : '📢 全体') + '</span>' +
-                            '<span class="history-time-ago">' + timeAgo + '</span>' +
-                        '</div>' +
-                        '<div class="history-card-text">' + escapeHtml(m.rawText || m.text) + '</div>' +
-                    '</div>';
-                }).join('');
+                        return '<div class="' + cardClass + '">' +
+                            '<div class="history-card-header">' +
+                                '<span class="history-room-tag">' + (m.room ? '🏠 ' + escapeHtml(m.room) : '📢 全体') + '</span>' +
+                                '<span class="history-time-ago">' + escapeHtml(timeAgo) + '</span>' +
+                            '</div>' +
+                            '<div class="history-card-text">' + escapeHtml(txt) + '</div>' +
+                        '</div>';
+                    }).join('');
+                }
+
+                modal.classList.add('open');
+            } catch (err) {
+                console.error('モーダル表示エラー:', err);
+                const modal = document.getElementById('ticker-modal');
+                if (modal) modal.classList.add('open');
             }
-
-            modal.classList.add('open');
         }
 
         // 📋 静止一覧モーダルを閉じる
