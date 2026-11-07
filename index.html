@@ -697,6 +697,40 @@
             transform: translateY(-1px);
         }
 
+        /* ⚡️ 株価ティッカー風 ビューポート（文字が詰まらず横へ流れる枠） */
+        .cyber-ticker-viewport {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            position: relative;
+            white-space: nowrap;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .ticker-track {
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+            animation: tickerScroll 22s linear infinite;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            will-change: transform;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cyber-screen:hover .ticker-track {
+            animation-play-state: paused;
+        }
+
+        @keyframes tickerScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
         /* 微細な走査線効果 */
         .cyber-scanlines {
             position: absolute;
@@ -1017,9 +1051,11 @@
                 <div class="cyber-ticker-row">
                     <div class="cyber-screen" onclick="openTickerModal()" title="タップして静止一覧を表示">
                         <span class="cyber-live-tag">⚡ LIVE</span>
-                        <div class="cyber-scanlines"></div>
-                        <div class="ticker-track" id="ticker-track">
-                            <!-- ネオン文字がループスクロール -->
+                        <div class="cyber-ticker-viewport">
+                            <div class="cyber-scanlines"></div>
+                            <div class="ticker-track" id="ticker-track">
+                                <!-- ネオン文字がループスクロール -->
+                            </div>
                         </div>
                     </div>
                     <button type="button" class="cyber-list-btn-compact" onclick="openTickerModal()" title="履歴一覧を表示">
@@ -2067,7 +2103,7 @@
             track.innerHTML = fullContent + ' ' + fullContent;
             
             // 文字数に合わせてスクロール速度を調整
-            const totalChars = tickerMessages.reduce((sum, m) => sum + m.text.length, 0);
+            const totalChars = tickerMessages.reduce((sum, m) => sum + ((m.rawText || m.text || "")).length, 0);
             const duration = Math.max(15, Math.round(totalChars * 0.4));
             track.style.animationDuration = duration + 's';
         }
@@ -2084,6 +2120,7 @@
 
             const newMsg = {
                 type: 'msg',
+                text: text,
                 rawText: text,
                 room: currentRoom,
                 rawTime: new Date().toISOString(),
@@ -2097,8 +2134,15 @@
             if (msgOnly.length > 5) msgOnly.pop();
             tickerMessages = [...msgOnly, ...adOnly];
             try { localStorage.setItem('ito-ticker-messages', JSON.stringify(tickerMessages)); } catch (e) {}
-            renderTickerTrack();
+
+            // 入力欄を即座にクリア
             input.value = '';
+
+            try {
+                renderTickerTrack();
+            } catch (err) {
+                console.error('描画エラー:', err);
+            }
 
             // P2P通話相手がいれば直接も送信
             if (typeof dataConnection !== 'undefined' && dataConnection && dataConnection.open) {
