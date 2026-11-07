@@ -732,6 +732,17 @@
             margin-right: 24px;
         }
 
+        
+        .ticker-time-tag {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            opacity: 0.85;
+            font-weight: 400;
+            margin-left: 5px;
+            letter-spacing: 0;
+            display: inline-block;
+        }
+
         .ticker-item-msg {
             color: #00f0ff;
             text-shadow: 0 0 8px rgba(0, 240, 255, 0.85), 0 0 15px rgba(0, 240, 255, 0.4);
@@ -1937,7 +1948,7 @@
                 listEl.innerHTML = '<div class="history-empty">📭 まだ伝言はありません<br>「流す」ボタンから伝言や安否情報を残せます</div>';
             } else {
                 listEl.innerHTML = realMsgs.map(m => {
-                    const timeAgo = m.rawTime ? formatTimeAgo(m.rawTime) : (m.time || '');
+                    const timeAgo = m.rawTime ? formatTimeAgo(m.rawTime) : (m.timeAgo ? m.timeAgo.replace(/[()]/g, '') : '');
                     let cardClass = 'history-card';
                     if (m.text.includes('🔴') || m.text.includes('緊急') || m.text.includes('要救助')) cardClass += ' type-sos';
                     else if (m.text.includes('🟢') || m.text.includes('無事')) cardClass += ' type-safe';
@@ -1948,7 +1959,7 @@
                             '<span class="history-room-tag">' + (m.room ? '🏠 ' + escapeHtml(m.room) : '📢 全体') + '</span>' +
                             '<span class="history-time-ago">' + timeAgo + '</span>' +
                         '</div>' +
-                        '<div class="history-card-text">' + escapeHtml(m.text) + '</div>' +
+                        '<div class="history-card-text">' + escapeHtml(m.rawText || m.text) + '</div>' +
                     '</div>';
                 }).join('');
             }
@@ -1991,17 +2002,16 @@
                         { type: 'ad', text: '【NEWS】通話記録は残りません。安全な直通P2P回線 ───' }
                     ];
 
-                    // 📌 押し出し式：最新5件だけをキープ
-                    const recentCloud = data.messages.slice(-5);
+                    // 📌 押し出し式：最新5件だけをキープ（最新の伝言が先頭から流れるよう並び替え）
+                    const recentCloud = data.messages.slice(-5).reverse();
                     const cloudMsgs = recentCloud.map(m => {
                         const timeAgo = formatTimeAgo(m.time);
                         return {
                             type: 'msg',
-                            text: (m.room ? '[' + m.room + '] ' : '') + m.text + (timeAgo ? ' ⏱️' + timeAgo : ''),
                             rawText: m.text,
                             room: m.room,
                             rawTime: m.time,
-                            time: timeAgo
+                            timeAgo: timeAgo ? '(' + timeAgo + ')' : ''
                         };
                     });
 
@@ -2042,9 +2052,12 @@
             let htmlParts = [];
             tickerMessages.forEach((msg, idx) => {
                 if (msg.type === 'msg') {
-                    htmlParts.push('<span class="ticker-item-msg">💬 ' + escapeHtml(msg.text) + '</span>');
+                    const roomPrefix = msg.room ? '[' + escapeHtml(msg.room) + '] ' : '';
+                    const bodyText = escapeHtml(msg.rawText || msg.text || '');
+                    const timeTag = msg.timeAgo ? '<span class="ticker-time-tag">' + escapeHtml(msg.timeAgo) + '</span>' : '';
+                    htmlParts.push('<span class="ticker-item-msg">💬 ' + roomPrefix + bodyText + timeTag + '</span>');
                 } else {
-                    htmlParts.push('<span class="ticker-item-ad">' + escapeHtml(msg.text) + '</span>');
+                    htmlParts.push('<span class="ticker-item-ad">' + escapeHtml(msg.text || '') + '</span>');
                 }
                 htmlParts.push('<span class="ticker-separator">✦✦✦</span>');
             });
@@ -2071,11 +2084,10 @@
 
             const newMsg = {
                 type: 'msg',
-                text: (currentRoom ? '[' + currentRoom + '] ' : '') + text + ' ⏱️たった今',
                 rawText: text,
                 room: currentRoom,
                 rawTime: new Date().toISOString(),
-                time: 'たった今'
+                timeAgo: '(たった今)'
             };
 
             // 📌 押し出し式：伝言は最大5件までキープ
