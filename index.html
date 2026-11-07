@@ -592,19 +592,17 @@
             100% { opacity: 0; transform: scale(0.95); height: 0; padding: 0; margin: 0; border: none; overflow: hidden; }
         }
     
-        /* ⚡️ 近未来サイバーLED看板スタイル */
+        /* ⚡️ 近未来サイバーLED看板スタイル（横1行・電光スクリーン最大化） */
         .cyber-ticker-card {
-            margin: 16px 0 20px 0;
+            margin: 14px 0 18px 0;
             background: linear-gradient(180deg, #060913 0%, #03060f 100%);
             border: 1px solid rgba(0, 240, 255, 0.28);
-            border-radius: 14px;
-            padding: 10px 12px 12px 12px;
+            border-radius: 12px;
+            padding: 10px 10px 12px 10px;
             box-shadow: 0 0 20px rgba(0, 240, 255, 0.08), inset 0 0 15px rgba(0, 0, 0, 0.9);
             position: relative;
-            overflow: hidden;
         }
 
-        /* 上部の微細なアクセントネオンライン */
         .cyber-ticker-card::before {
             content: '';
             position: absolute;
@@ -614,106 +612,99 @@
             box-shadow: 0 0 8px #00f0ff;
         }
 
-        /* 📡 ヘッダー（横一行・ミニマル化） */
-        .cyber-ticker-bar {
+        /* 📡 電光スクリーンと履歴ボタンを横1行に合体 */
+        .cyber-ticker-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            padding: 0 2px;
+            gap: 8px;
+            width: 100%;
         }
 
-        .cyber-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .cyber-dot {
-            width: 7px;
-            height: 7px;
-            background: #00f0ff;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #00f0ff, 0 0 14px rgba(0, 240, 255, 0.8);
-            animation: cyberPulse 1.6s infinite ease-in-out;
-        }
-
-        @keyframes cyberPulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.35; transform: scale(0.8); }
-        }
-
-        .cyber-title {
-            font-size: 0.78rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            color: #e0f2fe;
-            text-transform: uppercase;
-            text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
-        }
-
-        .cyber-sub {
-            font-size: 0.6rem;
-            font-weight: 700;
-            color: #00f0ff;
-            background: rgba(0, 240, 255, 0.12);
-            border: 1px solid rgba(0, 240, 255, 0.35);
-            padding: 1px 5px;
-            border-radius: 4px;
-            letter-spacing: 0.05em;
-        }
-
-        /* コンパクトな履歴ボタン */
-        .cyber-list-btn {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #94a3b8;
-            font-size: 0.68rem;
-            padding: 3px 9px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            box-shadow: none;
-            transition: all 0.2s ease;
-        }
-
-        .cyber-list-btn:hover {
-            background: rgba(0, 240, 255, 0.12);
-            border-color: #00f0ff;
-            color: #00f0ff;
-            box-shadow: 0 0 8px rgba(0, 240, 255, 0.25);
-            transform: translateY(-1px);
-        }
-
-        /* ⚡️ ネオン発光 LEDスクリーン */
+        /* ⚡️ ネオン発光 LEDスクリーン（横幅を限界まで最大化！） */
         .cyber-screen {
+            flex: 1;
+            min-width: 0; /* 文字あふれ防止 */
             background: #02040a;
-            border: 1px solid rgba(0, 240, 255, 0.22);
+            border: 1px solid rgba(0, 240, 255, 0.3);
             border-radius: 8px;
-            padding: 8px 10px;
+            padding: 7px 10px;
             overflow: hidden;
             white-space: nowrap;
             position: relative;
             cursor: pointer;
-            box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.9), 0 0 10px rgba(0, 240, 255, 0.05);
+            box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.9), 0 0 10px rgba(0, 240, 255, 0.06);
+            display: flex;
+            align-items: center;
+            height: 38px;
+            box-sizing: border-box;
             transition: border-color 0.25s, box-shadow 0.25s;
         }
 
         .cyber-screen:hover {
             border-color: #00f0ff;
-            box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.9), 0 0 14px rgba(0, 240, 255, 0.2);
+            box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.9), 0 0 14px rgba(0, 240, 255, 0.25);
         }
 
-        /* 微細な走査線（スキャンライン）効果 */
+        /* ⚡ LIVE バッジ */
+        .cyber-live-tag {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #00f0ff;
+            background: rgba(0, 240, 255, 0.12);
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 8px;
+            letter-spacing: 0.06em;
+            text-shadow: 0 0 6px #00f0ff;
+            flex-shrink: 0;
+            z-index: 3;
+            animation: cyberPulse 1.8s infinite ease-in-out;
+        }
+
+        @keyframes cyberPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* コンパクトな履歴ボタン（省スペース） */
+        .cyber-list-btn-compact {
+            width: auto;
+            flex-shrink: 0;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            color: #94a3b8;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            box-shadow: none;
+            height: 38px;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        .cyber-list-btn-compact:hover {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: #00f0ff;
+            color: #00f0ff;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* 微細な走査線効果 */
         .cyber-scanlines {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
             background-size: 100% 3px;
             pointer-events: none;
-            opacity: 0.45;
+            opacity: 0.4;
             z-index: 2;
         }
 
@@ -725,7 +716,7 @@
             animation: tickerScroll 20s linear infinite;
             font-family: 'Consolas', 'Courier New', monospace;
             font-size: 0.85rem;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.05em;
             will-change: transform;
             position: relative;
             z-index: 1;
@@ -735,28 +726,23 @@
             animation-play-state: paused;
         }
 
-        @keyframes tickerScroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
         .ticker-item-ad {
             color: #38bdf8;
             text-shadow: 0 0 7px rgba(56, 189, 248, 0.7);
-            margin-right: 26px;
+            margin-right: 24px;
         }
 
         .ticker-item-msg {
             color: #00f0ff;
             text-shadow: 0 0 8px rgba(0, 240, 255, 0.85), 0 0 15px rgba(0, 240, 255, 0.4);
             font-weight: 700;
-            margin-right: 26px;
+            margin-right: 24px;
         }
 
         .ticker-separator {
             color: #f59e0b;
             text-shadow: 0 0 6px rgba(245, 158, 11, 0.8);
-            margin-right: 26px;
+            margin-right: 24px;
             font-size: 0.75rem;
         }
 
@@ -1016,24 +1002,18 @@
 
             <!-- 🍸 BAR風 電光掲示板（LEDティッカー） -->
             <div class="cyber-ticker-card" id="bar-ticker-container">
-                <!-- 📡 近未来看板ヘッダー（横一行・コンパクト） -->
-                <div class="cyber-ticker-bar">
-                    <div class="cyber-badge">
-                        <span class="cyber-dot"></span>
-                        <span class="cyber-title">電光ニュース</span>
-                        <span class="cyber-sub">LIVE</span>
+                <!-- ⚡️ 電光看板（横幅最大化）＋ 右端コンパクト履歴ボタン（横1行） -->
+                <div class="cyber-ticker-row">
+                    <div class="cyber-screen" onclick="openTickerModal()" title="タップして静止一覧を表示">
+                        <span class="cyber-live-tag">⚡ LIVE</span>
+                        <div class="cyber-scanlines"></div>
+                        <div class="ticker-track" id="ticker-track">
+                            <!-- ネオン文字がループスクロール -->
+                        </div>
                     </div>
-                    <button type="button" class="cyber-list-btn" onclick="openTickerModal()" title="履歴一覧を表示">
+                    <button type="button" class="cyber-list-btn-compact" onclick="openTickerModal()" title="履歴一覧を表示">
                         📋 履歴
                     </button>
-                </div>
-                
-                <!-- ⚡️ ネオン発光 LEDスクリーン（タップで一覧展開） -->
-                <div class="cyber-screen" onclick="openTickerModal()" title="タップして静止一覧を表示">
-                    <div class="cyber-scanlines"></div>
-                    <div class="ticker-track" id="ticker-track">
-                        <!-- ネオン文字がループスクロール -->
-                    </div>
                 </div>
 
                 <!-- 伝言を流す近未来入力バー -->
