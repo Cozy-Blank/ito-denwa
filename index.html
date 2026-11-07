@@ -592,103 +592,146 @@
             100% { opacity: 0; transform: scale(0.95); height: 0; padding: 0; margin: 0; border: none; overflow: hidden; }
         }
     
-        /* ✨ 洗練された看板電光ニュース（モダン・スマートデザイン） */
-        .ticker-container {
+        /* ⚡️ 近未来サイバーLED看板スタイル */
+        .cyber-ticker-card {
             margin: 16px 0 20px 0;
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.7) 0%, rgba(10, 15, 30, 0.88) 100%);
-            border: 1px solid rgba(56, 189, 248, 0.18);
+            background: linear-gradient(180deg, #060913 0%, #03060f 100%);
+            border: 1px solid rgba(0, 240, 255, 0.28);
             border-radius: 14px;
-            padding: 12px 14px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
+            padding: 10px 12px 12px 12px;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.08), inset 0 0 15px rgba(0, 0, 0, 0.9);
             position: relative;
+            overflow: hidden;
         }
 
-        .ticker-header {
+        /* 上部の微細なアクセントネオンライン */
+        .cyber-ticker-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 15%; right: 15%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00f0ff, transparent);
+            box-shadow: 0 0 8px #00f0ff;
+        }
+
+        /* 📡 ヘッダー（横一行・ミニマル化） */
+        .cyber-ticker-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 9px;
+            margin-bottom: 8px;
             padding: 0 2px;
         }
 
-        .ticker-badge {
+        .cyber-badge {
             display: inline-flex;
             align-items: center;
-            gap: 7px;
-            color: #e2e8f0;
-            font-size: 0.78rem;
-            font-weight: 600;
-            letter-spacing: 0.06em;
+            gap: 6px;
         }
 
-        .ticker-badge .blink-dot {
+        .cyber-dot {
             width: 7px;
             height: 7px;
-            background: #38bdf8;
+            background: #00f0ff;
             border-radius: 50%;
-            box-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
-            animation: tickerBlink 1.8s infinite ease-in-out;
+            box-shadow: 0 0 8px #00f0ff, 0 0 14px rgba(0, 240, 255, 0.8);
+            animation: cyberPulse 1.6s infinite ease-in-out;
         }
 
-        @keyframes tickerBlink {
+        @keyframes cyberPulse {
             0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.35; transform: scale(0.85); }
+            50% { opacity: 0.35; transform: scale(0.8); }
         }
 
-        .ticker-open-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+        .cyber-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: #e0f2fe;
+            text-transform: uppercase;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+        }
+
+        .cyber-sub {
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #00f0ff;
+            background: rgba(0, 240, 255, 0.12);
+            border: 1px solid rgba(0, 240, 255, 0.35);
+            padding: 1px 5px;
+            border-radius: 4px;
+            letter-spacing: 0.05em;
+        }
+
+        /* コンパクトな履歴ボタン */
+        .cyber-list-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             color: #94a3b8;
-            font-size: 0.7rem;
-            padding: 4px 10px;
-            border-radius: 20px;
+            font-size: 0.68rem;
+            padding: 3px 9px;
+            border-radius: 6px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            transition: all 0.2s ease;
+            gap: 4px;
             box-shadow: none;
+            transition: all 0.2s ease;
         }
 
-        .ticker-open-btn:hover {
-            background: rgba(56, 189, 248, 0.12);
-            border-color: rgba(56, 189, 248, 0.3);
-            color: #38bdf8;
+        .cyber-list-btn:hover {
+            background: rgba(0, 240, 255, 0.12);
+            border-color: #00f0ff;
+            color: #00f0ff;
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.25);
             transform: translateY(-1px);
         }
 
-        /* スクリーン */
-        .ticker-screen {
-            background: rgba(3, 7, 18, 0.82);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 10px;
-            padding: 9px 12px;
+        /* ⚡️ ネオン発光 LEDスクリーン */
+        .cyber-screen {
+            background: #02040a;
+            border: 1px solid rgba(0, 240, 255, 0.22);
+            border-radius: 8px;
+            padding: 8px 10px;
             overflow: hidden;
             white-space: nowrap;
             position: relative;
             cursor: pointer;
+            box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.9), 0 0 10px rgba(0, 240, 255, 0.05);
             transition: border-color 0.25s, box-shadow 0.25s;
         }
 
-        .ticker-screen:hover {
-            border-color: rgba(56, 189, 248, 0.4);
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.1);
+        .cyber-screen:hover {
+            border-color: #00f0ff;
+            box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.9), 0 0 14px rgba(0, 240, 255, 0.2);
         }
 
+        /* 微細な走査線（スキャンライン）効果 */
+        .cyber-scanlines {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 3px;
+            pointer-events: none;
+            opacity: 0.45;
+            z-index: 2;
+        }
+
+        /* 流れるネオンテキスト */
         .ticker-track {
             display: inline-flex;
             align-items: center;
             white-space: nowrap;
-            animation: tickerScroll 22s linear infinite;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-            font-size: 0.83rem;
-            color: #f1f5f9;
-            letter-spacing: 0.03em;
+            animation: tickerScroll 20s linear infinite;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85rem;
+            letter-spacing: 0.06em;
             will-change: transform;
+            position: relative;
+            z-index: 1;
         }
 
-        .ticker-screen:hover .ticker-track {
+        .cyber-screen:hover .ticker-track {
             animation-play-state: paused;
         }
 
@@ -698,73 +741,73 @@
         }
 
         .ticker-item-ad {
-            color: #94a3b8;
-            margin-right: 28px;
-            font-weight: 400;
+            color: #38bdf8;
+            text-shadow: 0 0 7px rgba(56, 189, 248, 0.7);
+            margin-right: 26px;
         }
 
         .ticker-item-msg {
-            color: #38bdf8;
-            font-weight: 500;
-            margin-right: 28px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+            color: #00f0ff;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.85), 0 0 15px rgba(0, 240, 255, 0.4);
+            font-weight: 700;
+            margin-right: 26px;
         }
 
         .ticker-separator {
-            color: rgba(255, 255, 255, 0.2);
-            margin-right: 28px;
+            color: #f59e0b;
+            text-shadow: 0 0 6px rgba(245, 158, 11, 0.8);
+            margin-right: 26px;
             font-size: 0.75rem;
         }
 
-        /* メッセージ入力行 */
-        .ticker-input-row {
+        /* 近未来入力バー */
+        .cyber-input-row {
             display: flex;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 6px;
+            margin-top: 9px;
         }
 
-        .ticker-input-row input {
+        .cyber-input-row input {
             flex: 1;
             margin-bottom: 0;
             font-size: 0.82rem;
-            padding: 9px 12px;
-            background: rgba(3, 7, 18, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            background: rgba(4, 8, 18, 0.85);
+            border: 1px solid rgba(0, 240, 255, 0.2);
             color: #f8fafc;
-            border-radius: 9px;
+            border-radius: 8px;
             transition: all 0.2s ease;
         }
 
-        .ticker-input-row input:focus {
-            border-color: #38bdf8;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
-            background: rgba(3, 7, 18, 0.85);
+        .cyber-input-row input:focus {
+            border-color: #00f0ff;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+            background: rgba(6, 11, 24, 0.95);
         }
 
-        .ticker-input-row button {
+        .cyber-input-row button {
             width: auto;
-            min-width: 68px;
-            padding: 9px 14px;
+            min-width: 64px;
+            padding: 8px 14px;
             font-size: 0.8rem;
-            font-weight: 600;
-            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-            color: #ffffff;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00f0ff 0%, #0284c7 100%);
+            color: #020617;
             border: none;
-            border-radius: 9px;
-            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.25);
+            border-radius: 8px;
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
             cursor: pointer;
+            letter-spacing: 0.04em;
             transition: all 0.2s ease;
         }
 
-        .ticker-input-row button:hover {
-            background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+        .cyber-input-row button:hover {
+            background: linear-gradient(135deg, #38bdf8 0%, #00f0ff 100%);
+            box-shadow: 0 0 16px rgba(0, 240, 255, 0.5);
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.35);
         }
 
-        /* 🚨 防災・安否クイックボタン（洗練されたピルスタイル） */
+        /* 🚨 防災・安否クイックボタン */
         .safety-badge-row {
             display: flex;
             gap: 6px;
@@ -775,62 +818,58 @@
             flex: 1;
             white-space: nowrap;
             font-size: 0.72rem;
-            padding: 6px 6px;
-            border-radius: 20px;
+            padding: 6px 4px;
+            border-radius: 6px;
             border: 1px solid transparent;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 4px;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.15s ease;
             box-shadow: none;
         }
 
-        .safety-badge-btn:hover {
-            transform: translateY(-1px);
-        }
-        .safety-badge-btn:active {
-            transform: scale(0.97);
-        }
-
         .badge-safe {
-            background: rgba(16, 185, 129, 0.1);
-            border-color: rgba(16, 185, 129, 0.25);
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.35);
             color: #34d399;
+            text-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
         }
         .badge-safe:hover {
-            background: rgba(16, 185, 129, 0.2);
-            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.22);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
         }
 
         .badge-evac {
-            background: rgba(245, 158, 11, 0.1);
-            border-color: rgba(245, 158, 11, 0.25);
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.35);
             color: #fbbf24;
+            text-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
         }
         .badge-evac:hover {
-            background: rgba(245, 158, 11, 0.2);
-            border-color: rgba(245, 158, 11, 0.4);
+            background: rgba(245, 158, 11, 0.22);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
         }
 
         .badge-sos {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.25);
+            background: rgba(239, 68, 68, 0.12);
+            border-color: rgba(239, 68, 68, 0.35);
             color: #f87171;
+            text-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
         }
         .badge-sos:hover {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: rgba(239, 68, 68, 0.4);
+            background: rgba(239, 68, 68, 0.22);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
         }
 
-        /* 📋 洗練された静止一覧モーダル */
+        /* 📋 静止一覧モーダル（サイバー調） */
         .ticker-modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(3, 7, 18, 0.8);
+            background: rgba(2, 6, 18, 0.85);
             backdrop-filter: blur(6px);
             z-index: 9999;
             align-items: center;
@@ -842,15 +881,15 @@
         }
 
         .ticker-modal-card {
-            background: #0b1329;
-            border: 1px solid rgba(56, 189, 248, 0.25);
-            border-radius: 16px;
+            background: #050a18;
+            border: 1px solid rgba(0, 240, 255, 0.35);
+            border-radius: 14px;
             width: 100%;
             max-width: 440px;
             max-height: 85vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.15), 0 15px 40px rgba(0, 0, 0, 0.8);
             overflow: hidden;
             animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -861,19 +900,21 @@
         }
 
         .ticker-modal-header {
-            padding: 14px 18px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.15);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            background: rgba(0, 240, 255, 0.04);
         }
         .ticker-modal-title {
-            font-size: 0.92rem;
-            font-weight: 600;
-            color: #f1f5f9;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #00f0ff;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
         }
         .ticker-modal-close {
             background: transparent;
@@ -885,11 +926,9 @@
             border-radius: 6px;
             box-shadow: none;
             width: auto;
-            transition: color 0.15s;
         }
         .ticker-modal-close:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.08);
+            color: #00f0ff;
         }
 
         .ticker-modal-body {
@@ -901,25 +940,25 @@
         }
 
         .history-card {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 11px;
-            padding: 12px 14px;
+            background: rgba(6, 12, 28, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 11px 13px;
             display: flex;
             flex-direction: column;
             gap: 6px;
         }
         .history-card.type-sos {
-            border-color: rgba(239, 68, 68, 0.35);
-            background: rgba(239, 68, 68, 0.06);
+            border-color: rgba(239, 68, 68, 0.45);
+            background: rgba(239, 68, 68, 0.08);
         }
         .history-card.type-safe {
-            border-color: rgba(16, 185, 129, 0.3);
-            background: rgba(16, 185, 129, 0.05);
+            border-color: rgba(16, 185, 129, 0.45);
+            background: rgba(16, 185, 129, 0.08);
         }
         .history-card.type-evac {
-            border-color: rgba(245, 158, 11, 0.3);
-            background: rgba(245, 158, 11, 0.05);
+            border-color: rgba(245, 158, 11, 0.45);
+            background: rgba(245, 158, 11, 0.08);
         }
 
         .history-card-header {
@@ -929,16 +968,16 @@
             font-size: 0.72rem;
         }
         .history-room-tag {
-            color: #38bdf8;
-            font-weight: 500;
+            color: #00f0ff;
+            font-weight: 600;
+            text-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
         }
         .history-time-ago {
             color: #94a3b8;
             background: rgba(255, 255, 255, 0.06);
-            padding: 2px 8px;
-            border-radius: 12px;
+            padding: 2px 7px;
+            border-radius: 10px;
             font-size: 0.68rem;
-            font-weight: 500;
         }
         .history-card-text {
             color: #f8fafc;
@@ -976,40 +1015,43 @@
             </div>
 
             <!-- 🍸 BAR風 電光掲示板（LEDティッカー） -->
-            <div class="ticker-container" id="bar-ticker-container">
-                <div class="ticker-header">
-                    <span class="ticker-badge">
-                        <span class="blink-dot"></span>
-                        看板電光ニュース
-                    </span>
-                    <button type="button" class="ticker-open-btn" onclick="openTickerModal()">
-                        📋 履歴一覧（静止表示）
+            <div class="cyber-ticker-card" id="bar-ticker-container">
+                <!-- 📡 近未来看板ヘッダー（横一行・コンパクト） -->
+                <div class="cyber-ticker-bar">
+                    <div class="cyber-badge">
+                        <span class="cyber-dot"></span>
+                        <span class="cyber-title">電光ニュース</span>
+                        <span class="cyber-sub">LIVE</span>
+                    </div>
+                    <button type="button" class="cyber-list-btn" onclick="openTickerModal()" title="履歴一覧を表示">
+                        📋 履歴
                     </button>
                 </div>
                 
-                <!-- タップで一覧を開ける電光板 -->
-                <div class="ticker-screen" onclick="openTickerModal()" title="タップして静止一覧を表示">
+                <!-- ⚡️ ネオン発光 LEDスクリーン（タップで一覧展開） -->
+                <div class="cyber-screen" onclick="openTickerModal()" title="タップして静止一覧を表示">
+                    <div class="cyber-scanlines"></div>
                     <div class="ticker-track" id="ticker-track">
-                        <!-- ここにスクロール文字が流れます -->
+                        <!-- ネオン文字がループスクロール -->
                     </div>
                 </div>
 
-                <!-- 伝言を流す入力枠 -->
-                <div class="ticker-input-row">
-                    <input type="text" id="ticker-input" placeholder="📢 掲示板にメッセージを流す..." maxlength="80">
+                <!-- 伝言を流す近未来入力バー -->
+                <div class="cyber-input-row">
+                    <input type="text" id="ticker-input" placeholder="📢 看板にメッセージを流す..." maxlength="80">
                     <button type="button" onclick="postTickerMessage()">流す</button>
                 </div>
 
-                <!-- 🚨 防災・安否クイックボタン（ワンタップ入力） -->
+                <!-- 🚨 防災・安否クイックボタン（スマートピル） -->
                 <div class="safety-badge-row">
                     <button type="button" class="safety-badge-btn badge-safe" onclick="applySafetyBadge('🟢 無事・自宅待機')">
-                        🟢 無事・待機
+                        🟢 無事
                     </button>
                     <button type="button" class="safety-badge-btn badge-evac" onclick="applySafetyBadge('🟡 避難所へ移動中')">
-                        🟡 避難所へ移動
+                        🟡 避難中
                     </button>
                     <button type="button" class="safety-badge-btn badge-sos" onclick="applySafetyBadge('🔴 要救助・連絡求む')">
-                        🔴 連絡求む(緊急)
+                        🔴 緊急
                     </button>
                 </div>
             </div>
@@ -1073,8 +1115,8 @@
 
                 <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 4px 16px 4px; line-height: 1.5;">
                     💡 <strong>使い方のヒント：</strong><br>
-                    合言葉の末尾に <code>-3</code> のように人数をつけると、その人数の部屋として認識されます（例: <code>kazoku-3</code> = 3人部屋）。<br>
-                    通話中に「📝 言伝」で短いメッセージを送れます。通話終了までそのまま画面に残ります。
+                    合言葉の末尾に <code>-3</code> で人数認識（例: <code>kazoku-3</code> = 3人部屋）。<br>
+                    通話中は画面下でリアルタイムチャットが可能（通話を切ると履歴は自動消去されます）。
                 </p>
             </div>
 
