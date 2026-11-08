@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>使い方・アプリ化ガイド | 意図電話</title>
+    
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <meta name="theme-color" content="#070616">
+
+    <style>
+        :root {
+            --bg-color: #070616;
+            --card-bg: #151452;
+            --border-color: rgba(140, 150, 255, 0.24);
+            --text-color: #f8fafc;
+            --text-muted: #b4c0e4;
+            --accent-color: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.28);
+            --success-color: #10b981;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Meiryo", sans-serif;
+            background: radial-gradient(circle at 50% 0%, #1b1a68 0%, #070616 80%);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            box-sizing: border-box;
+            padding: 16px;
+        }
+
+        .card {
+            background: linear-gradient(90deg, #070616 0%, #1b1a68 50%, #2d2aa8 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px 20px 32px 20px;
+            box-shadow: 0 12px 35px -5px rgba(4, 3, 16, 0.75), 0 0 25px rgba(50, 47, 188, 0.25);
+        }
+
+        .back-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #38bdf8;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: rgba(14, 165, 233, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            transition: all 0.2s;
+        }
+        .back-nav:hover {
+            background: rgba(14, 165, 233, 0.25);
+            transform: translateX(-2px);
+        }
+
+        .page-title {
+            font-size: 1.45rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            margin: 0 0 6px 0;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 40%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin: 0 0 22px 0;
+            line-height: 1.5;
+        }
+
+        .section-box {
+            background: rgba(7, 6, 22, 0.65);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 18px 16px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 0.96rem;
+            font-weight: 700;
+            color: #e0f2fe;
+            margin: 0 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 8px;
+        }
+
+        .browser-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+        }
+        .browser-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .browser-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #f8fafc;
+        }
+
+        .browser-steps {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+        .browser-steps li {
+            margin-bottom: 4px;
+        }
+        .browser-steps strong {
+            color: #e0f2fe;
+        }
+
+        .tip-callout {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.78rem;
+            line-height: 1.5;
+            color: #a7f3d0;
+            margin-top: 12px;
+        }
+
+        .feature-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+        .feature-item:last-child {
+            margin-bottom: 0;
+        }
+        .feature-icon {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .btn-bottom-return {
+            display: block;
+            text-align: center;
+            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            color: #fff;
+            text-decoration: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.03em;
+            box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
+            transition: all 0.2s;
+            margin-top: 24px;
+        }
+        .btn-bottom-return:hover {
+            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.45);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <main class="card">
+            <a href="index.html" class="back-nav">← 意図電話アプリに戻る</a>
+
+            <h1 class="page-title">📖 取扱説明書＆アプリ化ガイド</h1>
+            <p class="page-sub">
+                意図電話（ito-denwa）をより快適・安全にお使いいただくための使い方と、お使いのブラウザごとのホーム画面追加手順です。
+            </p>
+
+            <!-- 📲 ブラウザ別：ホーム画面に追加してアプリ化する手順 -->
+            <div class="section-box">
+                <h2 class="section-title">📲 ホーム画面に追加してアプリ化する</h2>
+                <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 12px 0;">
+                    ホーム画面に追加すると、アドレスバーが消えて本物のスマホアプリのように全画面で起動できます。
+                </p>
+
+                <!-- 🦁 Brave -->
+                <div class="browser-card">
+                    <div class="browser-header">
+                        <span>🦁</span> Braveブラウザをお使いの方
+                    </div>
+                    <ol class="browser-steps">
+                        <li>画面の上部または下部にある<strong>「メニュー（… または ︙）」</strong>をタップします。</li>
+                        <li>一覧から<strong>「ホーム画面に追加」</strong>をタップします。</li>
+                        <li>ホーム画面に「意図電話」のアイコンが作成され、全画面で起動できるようになります。</li>
+                    </ol>
+                    <div class="tip-callout">
+                        💡 <strong>マイクの許可について：</strong><br>
+                        スマホ本体の「設定 ＞ アプリ ＞ Brave ＞ 権限 ＞ マイク」で「アプリの使用中のみ許可」にしておくと、常にスムーズに通話できます。
+                    </div>
+                </div>
+
+                <!-- 🧭 Safari -->
+                <div class="browser-card">
+                    <div class="browser-header">
+                        <span>🧭</span> Safari（iPhone / iPad）をお使いの方
+                    </div>
+                    <ol class="browser-steps">
+                        <li>画面下のバーの中央にある<strong>「共有ボタン（四角から矢印が飛び出たマーク ⎋）」</strong>をタップします。</li>
+                        <li>少し下にスクロールして<strong>「ホーム画面に追加」</strong>をタップします。</li>
+                        <li>右上の「追加」を押すと、アプリアイコンがホーム画面に並びます。</li>
+                    </ol>
+                </div>
+
+                <!-- 🌐 Google Chrome -->
+                <div class="browser-card">
+                    <div class="browser-header">
+                        <span>🌐</span> Google Chrome（Android / PC）をお使いの方
+                    </div>
+                    <ol class="browser-steps">
+                        <li>画面右上の<strong>「メニュー（縦の3点リーダー ︙）」</strong>をタップします。</li>
+                        <li><strong>「アプリをインストール」</strong>または<strong>「ホーム画面に追加」</strong>を選びます。</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 💡 意図電話の便利な使い方 -->
+            <div class="section-box">
+                <h2 class="section-title">💡 上手な使い方のヒント</h2>
+
+                <div class="feature-item">
+                    <span class="feature-icon">🏠</span>
+                    <div>
+                        <strong style="color: #e0f2fe;">秘密の合言葉ルーム</strong><br>
+                        <span style="color: var(--text-muted); font-size: 0.76rem;">
+                            家族や仲間と決めた合言葉（例: <code>kazoku-3</code>）を入力します。末尾に <code>-3</code> や <code>-4</code> をつけると、最大4人までのグループ通話が可能です。
+                        </span>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">🟢</span>
+                    <div>
+                        <strong style="color: #e0f2fe;">待機中ランプと着信音</strong><br>
+                        <span style="color: var(--text-muted); font-size: 0.76rem;">
+                            「待機する」を押すと、かける側にも「🟢 待機中」と表示されます。電話がかかってくるとオルゴールの優しいチャイム音が鳴ります。
+                        </span>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">📢</span>
+                    <div>
+                        <strong style="color: #e0f2fe;">マイ合言葉チップ＆電光看板</strong><br>
+                        <span style="color: var(--text-muted); font-size: 0.76rem;">
+                            一度使った合言葉は上のチップとして自動保存されます。タップするだけで家族・友達別のメッセージに看板が切り替わります。
+                        </span>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">🔒</span>
+                    <div>
+                        <strong style="color: #e0f2fe;">完全な痕跡ゼロ消去</strong><br>
+                        <span style="color: var(--text-muted); font-size: 0.76rem;">
+                            通話中のみ画面下でリアルタイムチャットができます。通話を切ると音声もメッセージもサーバーや端末から痕跡ゼロで自動消滅します。
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <a href="index.html" class="btn-bottom-return">← 意図電話アプリへ戻る</a>
+        </main>
+    </div>
+
+</body>
+</html>

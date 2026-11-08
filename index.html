@@ -211,6 +211,139 @@
             word-break: break-all;
         }
 
+        /* 💎 洗練された通話アクションボタン（待機＆呼ぶ デュアルカードスタイル） */
+        .room-action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .btn-room-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 13px 8px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 1px solid;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .btn-room-action .btn-icon-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-room-action .btn-sublabel {
+            font-size: 0.68rem;
+            opacity: 0.8;
+            margin-top: 3px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+
+        /* 🏠 待機ボタン：シアン×インディゴの上品なすりガラス発光 */
+        .btn-room-wait {
+            background: linear-gradient(145deg, rgba(14, 165, 233, 0.24) 0%, rgba(7, 6, 22, 0.75) 100%);
+            border-color: rgba(56, 189, 248, 0.45);
+            color: #e0f2fe;
+            box-shadow: 0 4px 18px rgba(14, 165, 233, 0.16), inset 0 1px 1px rgba(255, 255, 255, 0.18);
+        }
+
+        .btn-room-wait:hover {
+            background: linear-gradient(145deg, rgba(14, 165, 233, 0.38) 0%, rgba(15, 23, 42, 0.85) 100%);
+            border-color: #38bdf8;
+            box-shadow: 0 6px 24px rgba(14, 165, 233, 0.32), inset 0 1px 2px rgba(255, 255, 255, 0.28);
+            transform: translateY(-2px);
+            color: #fff;
+        }
+
+        /* 📞 呼ぶボタン：エメラルド×ジェイドの生命力ある輝き */
+        .btn-room-call {
+            background: linear-gradient(145deg, rgba(16, 185, 129, 0.28) 0%, rgba(7, 6, 22, 0.75) 100%);
+            border-color: rgba(52, 211, 153, 0.5);
+            color: #d1fae5;
+            box-shadow: 0 4px 18px rgba(16, 185, 129, 0.18), inset 0 1px 1px rgba(255, 255, 255, 0.18);
+        }
+
+        .btn-room-call:hover {
+            background: linear-gradient(145deg, rgba(16, 185, 129, 0.42) 0%, rgba(6, 78, 59, 0.85) 100%);
+            border-color: #34d399;
+            box-shadow: 0 6px 24px rgba(16, 185, 129, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.28);
+            transform: translateY(-2px);
+            color: #fff;
+        }
+
+        .btn-room-action:active {
+            transform: translateY(0);
+        }
+
+        /* 📖 取扱説明書＆アプリ化ガイドリンクカード */
+        .guide-banner-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(90deg, rgba(27, 26, 104, 0.4) 0%, rgba(7, 6, 22, 0.65) 100%);
+            border: 1px solid rgba(140, 150, 255, 0.25);
+            border-radius: 14px;
+            padding: 12px 16px;
+            margin-top: 18px;
+            margin-bottom: 12px;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+        }
+        .guide-banner-link:hover {
+            border-color: rgba(56, 189, 248, 0.5);
+            background: linear-gradient(90deg, rgba(27, 26, 104, 0.6) 0%, rgba(50, 47, 188, 0.3) 100%);
+            box-shadow: 0 6px 20px rgba(50, 47, 188, 0.25);
+            transform: translateY(-1px);
+        }
+        .guide-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .guide-banner-icon {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+        .guide-banner-text strong {
+            display: block;
+            font-size: 0.84rem;
+            color: #e0f2fe;
+            letter-spacing: 0.02em;
+        }
+        .guide-banner-text span {
+            display: block;
+            font-size: 0.70rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .guide-banner-arrow {
+            font-size: 0.95rem;
+            color: #38bdf8;
+            opacity: 0.85;
+            transition: transform 0.2s;
+        }
+        .guide-banner-link:hover .guide-banner-arrow {
+            transform: translateX(3px);
+            opacity: 1;
+        }
+
         /* 🔘 ボタン共通 */
         button {
             background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
@@ -1306,12 +1439,15 @@
                         </button>
                     </div>
                     
-                    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                        <button type="button" onclick="joinRoomAs('wait')" style="background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);">
-                            🏠 部屋で待機する
+                    <!-- 💎 洗練された通話アクション（待機＆呼ぶ デュアルカード） -->
+                    <div class="room-action-grid">
+                        <button type="button" class="btn-room-action btn-room-wait" onclick="joinRoomAs('wait')">
+                            <span class="btn-icon-title">🏠 待機する</span>
+                            <span class="btn-sublabel">着信受付・待機</span>
                         </button>
-                        <button type="button" onclick="joinRoomAs('call')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-                            📞 部屋に入って呼ぶ
+                        <button type="button" class="btn-room-action btn-room-call" onclick="joinRoomAs('call')">
+                            <span class="btn-icon-title">📞 呼ぶ</span>
+                            <span class="btn-sublabel">部屋に入って発信</span>
                         </button>
                     </div>
 
@@ -1393,14 +1529,17 @@
                 🍃 通話は終了しました。音声・言伝すべてのデータがサーバー・端末から完全消去されました。
             </div>
 
-            <!-- 📱 スマホホーム画面追加ガイド -->
-            <div class="pwa-hint">
-                <span style="font-size: 1.3rem;">📲</span>
-                <div>
-                    <strong>ホーム画面に追加してアプリ化</strong><br>
-                    Safariの「共有」ボタン ➡️ 「ホーム画面に追加」を押すと、本物のアプリとして全画面で使えます。
+            <!-- 📖 使い方・各ブラウザ別アプリ化ガイドリンク -->
+            <a href="guide.html" class="guide-banner-link">
+                <div class="guide-banner-content">
+                    <span class="guide-banner-icon">📖</span>
+                    <div class="guide-banner-text">
+                        <strong>使い方＆アプリ化ガイド</strong>
+                        <span>Brave・Safari・Chromeでの全画面追加とマイク設定</span>
+                    </div>
                 </div>
-            </div>
+                <span class="guide-banner-arrow">➔</span>
+            </a>
 
             <p class="footer-note">
                 ※WebRTC暗号化通信。音声はサーバーを通さず端末同士で直接やりとりされ、通話終了後に痕跡は完全消滅します。
