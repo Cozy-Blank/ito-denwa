@@ -591,6 +591,101 @@
             100% { opacity: 0; transform: scale(0.95); height: 0; padding: 0; margin: 0; border: none; overflow: hidden; }
         }
     
+        /* 🟢 合言葉ルーム 待機中ステータスカード */
+        .room-waiting-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(6, 78, 59, 0.22) 100%);
+            border: 1px solid rgba(52, 211, 153, 0.45);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.15), inset 0 0 12px rgba(16, 185, 129, 0.08);
+            animation: fadeInWait 0.3s ease;
+        }
+
+        @keyframes fadeInWait {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .waiting-badge-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .waiting-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16, 185, 129, 0.25);
+            color: #34d399;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            border: 1px solid rgba(52, 211, 153, 0.4);
+        }
+
+        .waiting-pulse-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #34d399;
+            box-shadow: 0 0 8px #34d399;
+            animation: pulseWaitDot 1.4s infinite;
+        }
+
+        @keyframes pulseWaitDot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.5; }
+        }
+
+        .waiting-room-title {
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #f8fafc;
+            margin: 6px 0 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .waiting-room-title strong {
+            color: #38bdf8;
+            font-family: monospace;
+            background: rgba(14, 165, 233, 0.16);
+            padding: 2px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .waiting-desc {
+            font-size: 0.76rem;
+            color: #94a3b8;
+            margin: 0 0 10px 0;
+            line-height: 1.4;
+        }
+
+        .btn-cancel-wait {
+            background: rgba(244, 63, 94, 0.15);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, 0.35);
+            padding: 7px 12px;
+            font-size: 0.78rem;
+            border-radius: 8px;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: none;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel-wait:hover {
+            background: rgba(244, 63, 94, 0.25);
+            color: #fff;
+            transform: none;
+        }
+    
         /* ⚡️ 近未来サイバーLED看板スタイル（横1行・電光スクリーン最大化） */
         
         /* 🏷️ マイ合言葉チップ（部屋別ワンタップ切り替えバー） */
@@ -635,6 +730,23 @@
             color: #00f0ff;
             box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
             text-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
+        }
+
+        /* 🟢 待機中オンライン表示付きチップ */
+        .room-chip.has-waiter {
+            border-color: rgba(16, 185, 129, 0.5);
+            background: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+        }
+
+        .chip-online-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 6px #10b981;
+            display: inline-block;
+            animation: pulseWaitDot 1.4s infinite;
         }
 
         .cyber-ticker-card {
@@ -1158,11 +1270,31 @@
 
             <!-- 🏠 モード1：合言葉ルーム（家族・非常用集合ルーム） -->
             <div id="mode-room-panel">
+                <!-- 🟢 現在の待機中バナー（部屋で待機中のみ表示） -->
+                <div id="room-waiting-card" class="room-waiting-card" style="display: none;">
+                    <div class="waiting-badge-header">
+                        <span class="waiting-status-pill">
+                            <span class="waiting-pulse-dot"></span> 待機中
+                        </span>
+                        <span style="font-size: 0.72rem; color: #34d399;">着信受付OK</span>
+                    </div>
+                    <div class="waiting-room-title">
+                        合言葉 <strong id="waiting-room-name-display">-</strong>
+                    </div>
+                    <p class="waiting-desc">相手が同じ合言葉で「呼ぶ」と、オルゴール音とともに着信します。</p>
+                    <button type="button" class="btn-cancel-wait" onclick="cancelRoomWaiting()">
+                        ✕ この部屋の待機を解除する
+                    </button>
+                </div>
+
                 <div class="content-box">
-                    <label class="box-label" for="room-input">
-                        家族・仲間で決めた「合言葉」を入力 <span id="room-capacity-indicator"></span>
-                    </label>
-                    <input type="text" id="room-input" placeholder="例: kazoku-3（末尾の数字＝人数）" oninput="detectRoomCapacity()">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label class="box-label" for="room-input" style="margin-bottom: 0;">
+                            家族・仲間で決めた「合言葉」を入力 <span id="room-capacity-indicator"></span>
+                        </label>
+                        <span id="room-online-indicator" style="font-size: 0.72rem; font-weight: 600;"></span>
+                    </div>
+                    <input type="text" id="room-input" placeholder="例: kazoku-3（末尾の数字＝人数）" oninput="onRoomInputChange()">
                     
                     <!-- 📷 QRコード読み取り＆印刷ボタン -->
                     <div class="qr-action-row" style="display: flex; gap: 8px; margin-bottom: 12px;">
@@ -1216,6 +1348,10 @@
             <div id="in-call-area" class="in-call-panel">
                 <div class="pulsing-wave">🧵</div>
                 <div class="call-timer" id="call-timer">00:00</div>
+                <!-- 👥 参加人数バッジ（最大4人P2Pメッシュ通話） -->
+                <div id="call-participants-badge" style="display:inline-flex; align-items:center; gap:6px; background:rgba(14,165,233,0.15); border:1px solid rgba(56,189,248,0.35); color:#38bdf8; padding:3px 12px; border-radius:14px; font-size:0.75rem; font-weight:600; margin-bottom:12px;">
+                    👥 通話中：2人 / 最大4人
+                </div>
                 <p id="call-status-desc" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
                     🔒 端末間直通・エンドツーエンド暗号化通話中
                 </p>
@@ -1322,8 +1458,9 @@
         </div>
     </div>
 
-    <!-- リモート音声再生用要素（非表示） -->
+    <!-- リモート音声再生用要素（非表示・最大4人メッシュ対応） -->
     <audio id="remote-audio" autoplay playsinline></audio>
+    <div id="remote-audios" style="display: none;"></div>
 
     <script>
         // Service Worker の登録（PWA用）
@@ -1338,12 +1475,18 @@
         // 状態管理
         let peer = null;
         let localStream = null;
-        let currentCall = null;
         let incomingCallObj = null;
         let timerInterval = null;
         let elapsedSeconds = 0;
         let isMuted = false;
         let currentMode = 'room'; // 'room' | 'direct'
+
+        // 👥 最大4人P2Pメッシュ通話管理
+        const MAX_PARTICIPANTS = 4;
+        let activeCalls = {};       // peerId -> MediaConnection
+        let activeDataConns = {};   // peerId -> DataConnection
+        let roomMembers = [];       // ルーム内の全PeerID一覧
+        let onlineRooms = {};       // roomName -> true / false (待機中かどうか)
 
         // DOM要素
         const myPeerIdEl = document.getElementById('my-peer-id');
@@ -1460,6 +1603,31 @@
         }
 
         // Peer初期化
+        let currentWaitingRoom = null; // 現在待機中の合言葉名
+
+        function showWaitingCard(roomName) {
+            const card = document.getElementById('room-waiting-card');
+            const display = document.getElementById('waiting-room-name-display');
+            if (card && display) {
+                display.textContent = roomName;
+                card.style.display = 'block';
+            }
+        }
+
+        function hideWaitingCard() {
+            const card = document.getElementById('room-waiting-card');
+            if (card) {
+                card.style.display = 'none';
+            }
+        }
+
+        function cancelRoomWaiting() {
+            currentWaitingRoom = null;
+            hideWaitingCard();
+            initPeer(); // 通常のP2PランダムIDに戻す
+            if (p2pStatus) p2pStatus.textContent = 'P2P回線：通話待機中';
+        }
+
         function initPeer(customId = null) {
             if (peer) {
                 peer.destroy();
@@ -1472,12 +1640,29 @@
             peer.on('open', (id) => {
                 myPeerIdEl.textContent = id;
                 directCallBtn.disabled = false;
-                p2pStatus.textContent = customId ? `待機中（部屋: ${id.replace('ito-room-', '')}）` : 'P2P回線：通話待機中';
+                if (currentWaitingRoom) {
+                    showWaitingCard(currentWaitingRoom);
+                    p2pStatus.textContent = `🟢 待機中（合言葉: ${currentWaitingRoom}）`;
+                } else {
+                    hideWaitingCard();
+                    p2pStatus.textContent = 'P2P回線：通話待機中';
+                }
             });
 
             peer.on('error', (err) => {
                 console.error(err);
-                if (err.type === 'unavailable-id') {
+                if (err.type === 'peer-unavailable') {
+                    // プローブ対象または相手が不在
+                    const match = err.message ? err.message.match(/peer\s+([^\s]+)/i) : null;
+                    if (match && match[1]) {
+                        const cleanRoom = match[1].replace('ito-room-', '');
+                        onlineRooms[cleanRoom] = false;
+                        renderRoomChips();
+                        updateRoomOnlineIndicator();
+                    }
+                } else if (err.type === 'unavailable-id') {
+                    hideWaitingCard();
+                    currentWaitingRoom = null;
                     if (customId) {
                         alert('その部屋はすでに別の方が待機中です。「部屋に入って呼ぶ」をお試しください。');
                     } else {
@@ -1631,9 +1816,10 @@
             if (role === 'wait') {
                 // 自分がホスト（待機側）として部屋を開く
                 playReadyChime();
-                p2pStatus.textContent = `「${roomName}」で待機開始中...`;
+                currentWaitingRoom = roomName;
+                showWaitingCard(roomName);
+                p2pStatus.textContent = `🟢 待機中（合言葉: ${roomName}）`;
                 initPeer(hostPeerId);
-                alert(`🏠 合言葉「${roomName}」の部屋を開きました。\n相手が入室してくるのをお待ちください。`);
             } else {
                 // 相手（ホスト）を呼び出す発信
                 callTargetPeer(hostPeerId, `合言葉部屋「${roomName}」`);
@@ -1649,19 +1835,130 @@
             callTargetPeer(targetId, targetId);
         }
 
-        // 共通発信処理
+        // 👥 リモート音声管理（最大4人メッシュ通話）
+        function addRemoteAudio(peerId, stream) {
+            const container = document.getElementById('remote-audios');
+            if (!container) return;
+            let audio = document.getElementById('audio-' + peerId);
+            if (!audio) {
+                audio = document.createElement('audio');
+                audio.id = 'audio-' + peerId;
+                audio.autoplay = true;
+                audio.playsInline = true;
+                container.appendChild(audio);
+            }
+            audio.srcObject = stream;
+            audio.play().catch(e => console.log('Audio playback error:', e));
+            updateParticipantsBadge();
+        }
+
+        function removeRemoteAudio(peerId) {
+            const audio = document.getElementById('audio-' + peerId);
+            if (audio) {
+                audio.srcObject = null;
+                audio.remove();
+            }
+            updateParticipantsBadge();
+        }
+
+        function updateParticipantsBadge() {
+            const badge = document.getElementById('call-participants-badge');
+            if (!badge) return;
+            const count = 1 + Object.keys(activeCalls).length;
+            badge.textContent = `👥 通話中：${count}人 / 最大${MAX_PARTICIPANTS}人`;
+        }
+
+        // 🔍 かける側：合言葉部屋の待機中状態（オンライン）をプローブ判定
+        function probeRoomWaiter(roomName) {
+            if (!roomName || !peer || !peer.open) return;
+            const clean = roomName.trim();
+            if (!clean) return;
+
+            const targetHostId = sanitizeRoomId(clean);
+            if (peer.id === targetHostId) {
+                onlineRooms[clean] = true;
+                renderRoomChips();
+                updateRoomOnlineIndicator();
+                return;
+            }
+
+            try {
+                const probeConn = peer.connect(targetHostId, { reliable: false });
+                let settled = false;
+
+                probeConn.on('open', () => {
+                    if (!settled) {
+                        settled = true;
+                        onlineRooms[clean] = true;
+                        probeConn.close();
+                        renderRoomChips();
+                        updateRoomOnlineIndicator();
+                    }
+                });
+
+                probeConn.on('error', () => {
+                    if (!settled) {
+                        settled = true;
+                        onlineRooms[clean] = false;
+                        renderRoomChips();
+                        updateRoomOnlineIndicator();
+                    }
+                });
+
+                setTimeout(() => {
+                    if (!settled) {
+                        settled = true;
+                        try { probeConn.close(); } catch (e) {}
+                        renderRoomChips();
+                        updateRoomOnlineIndicator();
+                    }
+                }, 1600);
+            } catch (e) {}
+        }
+
+        function onRoomInputChange() {
+            detectRoomCapacity();
+            updateRoomOnlineIndicator();
+            const val = roomInput.value.trim();
+            if (val) {
+                probeRoomWaiter(val);
+            }
+        }
+
+        function updateRoomOnlineIndicator() {
+            const indicator = document.getElementById('room-online-indicator');
+            if (!indicator) return;
+            const val = roomInput.value.trim();
+            if (!val) {
+                indicator.innerHTML = '';
+                return;
+            }
+            if (onlineRooms[val]) {
+                indicator.innerHTML = '<span style="color:#34d399; display:inline-flex; align-items:center; gap:4px;"><span class="chip-online-dot"></span> 待機中（通話可能！）</span>';
+            } else {
+                indicator.innerHTML = '<span style="color:#94a3b8;">⚪︎ 待機なし（留守）</span>';
+            }
+        }
+
+        function probeAllMyRooms() {
+            if (!peer || !peer.open) return;
+            myRooms.forEach(room => probeRoomWaiter(room));
+        }
+
+        // 共通発信処理（最大4人メッシュ通話対応）
         async function callTargetPeer(targetId, displayName) {
             p2pStatus.textContent = `${displayName} に接続中...`;
             try {
                 const stream = await getLocalStream();
-                currentCall = peer.call(targetId, stream);
-
-                // 📝 言伝用のDataConnectionも同時に確立
                 myMemberId = generateMemberId();
+
+                const call = peer.call(targetId, stream);
+                setupCallEvents(call);
+
+                // 言伝＆メッシュ制御用DataConnection
                 const conn = peer.connect(targetId, { reliable: true });
                 setupDataConnection(conn);
 
-                setupCallEvents(currentCall);
             } catch (err) {
                 console.error(err);
                 alert('マイクのアクセスが許可されませんでした。ブラウザの設定からマイクを許可してください。');
@@ -1669,7 +1966,7 @@
             }
         }
 
-        // 着信応答
+        // 着信応答（最大4人メッシュ対応）
         async function acceptCall() {
             stopRingtone();
             incomingModal.style.display = 'none';
@@ -1678,9 +1975,11 @@
             try {
                 myMemberId = generateMemberId();
                 const stream = await getLocalStream();
-                currentCall = incomingCallObj;
-                currentCall.answer(stream);
-                setupCallEvents(currentCall);
+                if (incomingCallObj) {
+                    incomingCallObj.answer(stream);
+                    setupCallEvents(incomingCallObj);
+                    incomingCallObj = null;
+                }
             } catch (err) {
                 console.error(err);
                 alert('マイクのアクセスに失敗しました');
@@ -1698,26 +1997,41 @@
             }
         }
 
-        // 通話イベントのハンドリング
+        // 通話イベントのハンドリング（最大4人メッシュ通話）
         function setupCallEvents(call) {
+            const peerId = call.peer;
+            activeCalls[peerId] = call;
+
             call.on('stream', (remoteStream) => {
-                remoteAudio.srcObject = remoteStream;
-                remoteAudio.play();
+                addRemoteAudio(peerId, remoteStream);
                 showInCallScreen();
             });
 
             call.on('close', () => {
-                endCallLocally();
+                delete activeCalls[peerId];
+                removeRemoteAudio(peerId);
+                if (Object.keys(activeCalls).length === 0) {
+                    endCallLocally();
+                } else {
+                    updateParticipantsBadge();
+                }
             });
 
             call.on('error', (err) => {
-                console.error(err);
-                endCallLocally();
+                console.error('Call error with ' + peerId, err);
+                delete activeCalls[peerId];
+                removeRemoteAudio(peerId);
+                if (Object.keys(activeCalls).length === 0) {
+                    endCallLocally();
+                } else {
+                    updateParticipantsBadge();
+                }
             });
         }
 
         // 通話中画面の表示
         function showInCallScreen() {
+            hideWaitingCard();
             modeRoomPanel.style.display = 'none';
             modeDirectPanel.style.display = 'none';
             document.getElementById('mode-tabs').style.display = 'none';
@@ -1725,13 +2039,15 @@
             toast.style.display = 'none';
             p2pStatus.textContent = 'P2P通話中（直通暗号化）';
 
-            elapsedSeconds = 0;
-            updateTimerDisplay();
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                elapsedSeconds++;
+            updateParticipantsBadge();
+            if (!timerInterval) {
+                elapsedSeconds = 0;
                 updateTimerDisplay();
-            }, 1000);
+                timerInterval = setInterval(() => {
+                    elapsedSeconds++;
+                    updateTimerDisplay();
+                }, 1000);
+            }
         }
 
         // タイマー表示
@@ -1752,11 +2068,11 @@
             muteBtn.innerHTML = isMuted ? '🔇 ミュート中' : '🎤 ミュート';
         }
 
-        // 手動通話終了
+        // 手動通話終了（全員切断）
         function endCall() {
-            if (currentCall) {
-                currentCall.close();
-            }
+            Object.values(activeCalls).forEach(call => {
+                try { call.close(); } catch (e) {}
+            });
             endCallLocally();
         }
 
@@ -1764,14 +2080,27 @@
         function endCallLocally() {
             stopRingtone();
             clearInterval(timerInterval);
-            currentCall = null;
+            timerInterval = null;
+
+            // 全アクティブ通話・接続を破棄
+            Object.values(activeCalls).forEach(call => {
+                try { call.close(); } catch (e) {}
+            });
+            activeCalls = {};
+
+            Object.values(activeDataConns).forEach(conn => {
+                try { conn.close(); } catch (e) {}
+            });
+            activeDataConns = {};
+
             incomingCallObj = null;
 
+            // 音声要素を完全クリア
+            const audioContainer = document.getElementById('remote-audios');
+            if (audioContainer) audioContainer.innerHTML = '';
+            remoteAudio.srcObject = null;
+
             // 📝 言伝データも完全消去（痕跡ゼロ）
-            if (dataConnection) {
-                dataConnection.close();
-                dataConnection = null;
-            }
             kotoduteMsgs = [];
             isKotoduteOpen = false;
             localStorage.removeItem('ito-kotodute');
@@ -1782,13 +2111,18 @@
                 localStream.getTracks().forEach(track => track.stop());
                 localStream = null;
             }
-            remoteAudio.srcObject = null;
 
             // 画面を元に戻す
             inCallArea.style.display = 'none';
             document.getElementById('mode-tabs').style.display = 'flex';
             switchMode(currentMode);
-            p2pStatus.textContent = 'P2P回線：通話待機中';
+
+            if (currentWaitingRoom) {
+                showWaitingCard(currentWaitingRoom);
+                p2pStatus.textContent = `🟢 待機中（合言葉: ${currentWaitingRoom}）`;
+            } else {
+                p2pStatus.textContent = 'P2P回線：通話待機中';
+            }
 
             toast.style.display = 'block';
             setTimeout(() => {
@@ -1885,27 +2219,66 @@
             }
         }
 
-        // DataChannelの接続を確立
+        // DataChannelの接続を確立（複数人P2Pメッシュ対応）
         function setupDataConnection(conn) {
-            dataConnection = conn;
+            const peerId = conn.peer;
+            activeDataConns[peerId] = conn;
 
             conn.on('open', () => {
-                console.log('📝 DataChannel opened');
-                // 言伝パネルを表示
-                document.getElementById('kotodute-panel').style.display = 'block';
+                console.log('📝 DataChannel opened with ' + peerId);
+                const panel = document.getElementById('kotodute-panel');
+                if (panel) panel.style.display = 'block';
+
+                // ホスト（待機側）の場合：参加者全員のリストを新しい相手に共有
+                if (currentWaitingRoom) {
+                    broadcastMemberList();
+                }
             });
 
             conn.on('data', (data) => {
-                handleKotoduteData(data);
+                if (data && data.type === 'member-list') {
+                    // 他の参加者リストを受信したら自動でメッシュ接続
+                    handleMemberList(data.members);
+                } else {
+                    handleKotoduteData(data);
+                }
             });
 
             conn.on('close', () => {
-                console.log('📝 DataChannel closed');
-                dataConnection = null;
+                console.log('📝 DataChannel closed with ' + peerId);
+                delete activeDataConns[peerId];
             });
 
             conn.on('error', (err) => {
                 console.error('DataChannel error:', err);
+                delete activeDataConns[peerId];
+            });
+        }
+
+        // 👥 メンバーリストの全員配布（メッシュ構築）
+        function broadcastMemberList() {
+            const allMembers = [peer.id, ...Object.keys(activeCalls)];
+            Object.values(activeDataConns).forEach(conn => {
+                try {
+                    conn.send({ type: 'member-list', members: allMembers });
+                } catch (e) {}
+            });
+        }
+
+        // 👥 他メンバーへの自動メッシュ発信
+        async function handleMemberList(members) {
+            if (!Array.isArray(members)) return;
+            const stream = await getLocalStream();
+            members.forEach(memberId => {
+                if (memberId !== peer.id && !activeCalls[memberId]) {
+                    if (Object.keys(activeCalls).length < MAX_PARTICIPANTS - 1) {
+                        console.log('🔗 Connecting to mesh member:', memberId);
+                        const call = peer.call(memberId, stream);
+                        setupCallEvents(call);
+                        const conn = peer.connect(memberId, { reliable: true });
+                        setupDataConnection(conn);
+                    }
+                }
             });
         }
 
@@ -1967,16 +2340,18 @@
             }
         }
 
-        // 言伝を送信
+        // 言伝を送信（全参加者にP2P送信）
         function sendKotodute() {
             const input = document.getElementById('kotodute-input');
             const text = input.value.trim();
             if (!text) return;
-            if (!dataConnection || !dataConnection.open) {
+            const conns = Object.values(activeDataConns).filter(c => c && c.open);
+            if (conns.length === 0) {
                 alert('📝 相手との接続が切れています');
                 return;
             }
 
+            const currentRoom = (document.getElementById('room-input') ? document.getElementById('room-input').value.trim() : '');
             const msg = {
                 id: 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
                 text: text,
@@ -1986,30 +2361,34 @@
                 capacity: roomCapacity
             };
 
-            // 相手に送信
-            dataConnection.send({
-                type: 'kotodute',
-                id: msg.id,
-                text: msg.text,
-                sender: msg.sender,
-                timestamp: msg.timestamp,
-                capacity: msg.capacity
+            // 全参加者へ一斉P2P送信
+            conns.forEach(conn => {
+                try {
+                    conn.send({
+                        type: 'kotodute',
+                        id: msg.id,
+                        text: msg.text,
+                        sender: msg.sender,
+                        timestamp: msg.timestamp,
+                        capacity: msg.capacity
+                    });
+                } catch (e) {}
             });
 
             // 自分のリストにも追加
             kotoduteMsgs.push(msg);
             saveToLocal();
             renderKotoduteList();
-            saveMyRoom(currentRoom);
+            if (currentRoom) saveMyRoom(currentRoom);
 
             input.value = '';
-            if (currentRoom) saveMyRoom(currentRoom);
             input.focus();
         }
 
         // 既読を送信（パネルを開いた時）
         function sendReadReceipts() {
-            if (!dataConnection || !dataConnection.open) return;
+            const conns = Object.values(activeDataConns).filter(c => c && c.open);
+            if (conns.length === 0) return;
             kotoduteMsgs.forEach(msg => {
                 if (!msg.readBy.includes(myMemberId)) {
                     sendReadReceipt(msg.id);
@@ -2022,11 +2401,15 @@
 
         // 個別既読通知を送信
         function sendReadReceipt(msgId) {
-            if (!dataConnection || !dataConnection.open) return;
-            dataConnection.send({
-                type: 'read',
-                msgId: msgId,
-                reader: myMemberId
+            const conns = Object.values(activeDataConns).filter(c => c && c.open);
+            conns.forEach(conn => {
+                try {
+                    conn.send({
+                        type: 'read',
+                        msgId: msgId,
+                        reader: myMemberId
+                    });
+                } catch (e) {}
             });
 
             // ローカルにも反映
@@ -2216,6 +2599,8 @@
             if (roomInput && roomName) {
                 roomInput.value = roomName;
                 detectRoomCapacity();
+                updateRoomOnlineIndicator();
+                probeRoomWaiter(roomName);
             }
             renderRoomChips();
             fetchTickerFromCloud(currentFilterRoom);
@@ -2229,7 +2614,11 @@
 
             myRooms.forEach(room => {
                 const isActive = (currentFilterRoom.toLowerCase() === room.toLowerCase());
-                html += '<button type="button" class="room-chip' + (isActive ? ' active' : '') + '" onclick="selectRoomChip(\'' + escapeHtml(room) + '\')">🏠 ' + escapeHtml(room) + '</button>';
+                const isOnline = !!onlineRooms[room];
+                const onlineDot = isOnline ? ' <span class="chip-online-dot"></span> 待機中' : '';
+                const onlineClass = isOnline ? ' has-waiter' : '';
+
+                html += '<button type="button" class="room-chip' + (isActive ? ' active' : '') + onlineClass + '" onclick="selectRoomChip(\'' + escapeHtml(room) + '\')">🏠 ' + escapeHtml(room) + onlineDot + '</button>';
             });
 
             bar.innerHTML = html;
@@ -2396,6 +2785,8 @@
         loadTickerMessages();
         loadMyRooms();
         setInterval(() => fetchTickerFromCloud(), 20000);
+        setInterval(() => probeAllMyRooms(), 15000); // 15秒ごとに部屋の待機状態を更新
+        setTimeout(() => probeAllMyRooms(), 2000);   // 初回プローブ
 
     </script>
 </body>
