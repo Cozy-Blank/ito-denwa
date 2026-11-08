@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="意図電話">
-    <meta name="theme-color" content="#0b1120">
+    <meta name="theme-color" content="#070616">
 
     <!-- PeerJS CDN（P2P通信ライブラリ） -->
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -21,19 +21,20 @@
 
     <style>
         :root {
-            --bg-color: #0b1120;
-            --card-bg: #151f32;
-            --border-color: #26354a;
+            --bg-color: #070616;
+            --card-bg: #151452;
+            --border-color: rgba(140, 150, 255, 0.24);
             --text-color: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-color: #0ea5e9;
-            --accent-glow: rgba(14, 165, 233, 0.25);
+            --text-muted: #b4c0e4;
+            --accent-color: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.28);
             --danger-color: #f43f5e;
             --success-color: #10b981;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Meiryo", sans-serif;
+            background: radial-gradient(circle at 50% 0%, #1b1a68 0%, #070616 80%);
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
@@ -54,32 +55,30 @@
         }
 
         .card {
-            background-color: var(--card-bg);
+            background: linear-gradient(90deg, #070616 0%, #1b1a68 50%, #2d2aa8 100%);
             border: 1px solid var(--border-color);
             border-radius: 20px;
-            padding: 24px 20px;
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 20px rgba(14, 165, 233, 0.05);
+            padding: 20px 20px 24px 20px;
+            box-shadow: 0 12px 35px -5px rgba(4, 3, 16, 0.75), 0 0 25px rgba(50, 47, 188, 0.25);
             position: relative;
             overflow: hidden;
         }
 
-        /* 🎨 偏愛TOOL 看板イラスト額縁 */
+        /* 🎨 偏愛TOOL 看板イラスト額縁（Canva紺色グラデーション完全同化スタイル） */
         .illustration-area {
             width: 100%;
-            aspect-ratio: 16 / 9;
-            margin: -6px 0 14px 0;
+            margin: -4px 0 14px 0;
             border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 15px rgba(14, 165, 233, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             position: relative;
-            background: #0b1120;
+            background: linear-gradient(90deg, #070616 0%, #1b1a68 50%, #322fbc 100%);
         }
 
         .illustration-area img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto;
             display: block;
             transition: transform 0.3s ease;
         }
@@ -147,7 +146,7 @@
         /* 🔀 モード切り替えタブ */
         .tab-group {
             display: flex;
-            background: #0b1120;
+            background: rgba(7, 6, 22, 0.65);
             padding: 4px;
             border-radius: 12px;
             border: 1px solid var(--border-color);
@@ -170,7 +169,7 @@
         }
 
         .tab-btn.active {
-            background: #1e293b;
+            background: rgba(50, 47, 188, 0.45);
             color: #38bdf8;
             box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
@@ -183,7 +182,7 @@
 
         /* 📋 共通ボックス */
         .content-box {
-            background: #0b1120;
+            background: rgba(7, 6, 22, 0.58);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 16px;
