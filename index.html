@@ -1498,7 +1498,111 @@
             peer.on('call', (call) => {
                 incomingCallObj = call;
                 incomingModal.style.display = 'flex';
+                startRingtone();
+
+                // 相手が応答前に切った場合も音を止めてモーダルを閉じる
+                call.on('close', () => {
+                    stopRingtone();
+                    incomingModal.style.display = 'none';
+                });
             });
+        }
+
+        // 🎐 オルゴール・チャイム着信音（Web Audio API）
+        let ringtoneCtx = null;
+        let ringtoneTimer = null;
+
+        function ensureAudioContext() {
+            if (!ringtoneCtx) {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) ringtoneCtx = new AudioCtx();
+            }
+            if (ringtoneCtx && ringtoneCtx.state === 'suspended') {
+                ringtoneCtx.resume();
+            }
+            return ringtoneCtx;
+        }
+
+        // 画面の初回タップでスマホの音声ロックを静かに解除
+        document.addEventListener('pointerdown', () => {
+            ensureAudioContext();
+        }, { once: true });
+
+        // オルゴールの1音を優しく鳴らす関数
+        function playMusicBoxNote(freq, delaySec, durationSec = 0.9, volume = 0.16) {
+            const ctx = ensureAudioContext();
+            if (!ctx) return;
+
+            const startTime = ctx.currentTime + delaySec;
+            const osc = ctx.createOscillator();
+            const subOsc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            // 透明感のあるサイン波＋温かいトライアングル波のブレンド
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, startTime);
+
+            subOsc.type = 'triangle';
+            subOsc.frequency.setValueAtTime(freq * 2, startTime); // 1オクターブ上の倍音でキラキラ感をプラス
+
+            const subGain = ctx.createGain();
+            subGain.gain.setValueAtTime(0.03, startTime);
+
+            // オルゴールのようにポロンと鳴ってふわっと消える音量カーブ
+            gain.gain.setValueAtTime(0.001, startTime);
+            gain.gain.exponentialRampToValueAtTime(volume, startTime + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, startTime + durationSec);
+
+            osc.connect(gain);
+            subOsc.connect(subGain);
+            subGain.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start(startTime);
+            subOsc.start(startTime);
+            osc.stop(startTime + durationSec);
+            subOsc.stop(startTime + durationSec);
+        }
+
+        // 待機開始時のやさしい確認ポロン音（スマホの着信音ロック解除も兼ねる）
+        function playReadyChime() {
+            try {
+                playMusicBoxNote(523.25, 0.0, 0.6, 0.10); // ド
+                playMusicBoxNote(659.25, 0.12, 0.7, 0.10); // ミ
+                playMusicBoxNote(783.99, 0.24, 0.9, 0.12); // ソ
+            } catch (e) {}
+        }
+
+        // 着信中のオルゴールメロディ（ポロロロン♪…ポロロロン♪）
+        function playRingtonePhrase() {
+            try {
+                // 温かいメジャーセブンスのアルペジオ（ド・ミ・ソ・シ・高いド）
+                playMusicBoxNote(523.25, 0.00, 0.9, 0.16); // C5
+                playMusicBoxNote(659.25, 0.16, 0.9, 0.16); // E5
+                playMusicBoxNote(783.99, 0.32, 0.9, 0.16); // G5
+                playMusicBoxNote(987.77, 0.48, 1.0, 0.15); // B5
+                playMusicBoxNote(1046.50, 0.66, 1.4, 0.18); // C6
+
+                if (navigator.vibrate) {
+                    navigator.vibrate([180, 100, 180]);
+                }
+            } catch (e) {}
+        }
+
+        function startRingtone() {
+            stopRingtone();
+            playRingtonePhrase();
+            ringtoneTimer = setInterval(playRingtonePhrase, 2400);
+        }
+
+        function stopRingtone() {
+            if (ringtoneTimer) {
+                clearInterval(ringtoneTimer);
+                ringtoneTimer = null;
+            }
+            if (navigator.vibrate) {
+                try { navigator.vibrate(0); } catch (e) {}
+            }
         }
 
         // マイク音声の取得
@@ -1526,6 +1630,7 @@
 
             if (role === 'wait') {
                 // 自分がホスト（待機側）として部屋を開く
+                playReadyChime();
                 p2pStatus.textContent = `「${roomName}」で待機開始中...`;
                 initPeer(hostPeerId);
                 alert(`🏠 合言葉「${roomName}」の部屋を開きました。\n相手が入室してくるのをお待ちください。`);
@@ -1566,6 +1671,7 @@
 
         // 着信応答
         async function acceptCall() {
+            stopRingtone();
             incomingModal.style.display = 'none';
             p2pStatus.textContent = '接続中...';
 
@@ -1584,6 +1690,7 @@
 
         // 着信拒否
         function rejectCall() {
+            stopRingtone();
             incomingModal.style.display = 'none';
             if (incomingCallObj) {
                 incomingCallObj.close();
@@ -1655,6 +1762,7 @@
 
         // 通話終了処理（痕跡完全消去）
         function endCallLocally() {
+            stopRingtone();
             clearInterval(timerInterval);
             currentCall = null;
             incomingCallObj = null;
