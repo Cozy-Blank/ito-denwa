@@ -156,7 +156,7 @@
 
         .tab-btn {
             flex: 1;
-            padding: 9px 0;
+            padding: 8px 4px;
             font-size: 0.82rem;
             font-weight: 600;
             background: transparent;
@@ -166,6 +166,8 @@
             cursor: pointer;
             box-shadow: none;
             transition: all 0.2s;
+            text-align: center;
+            line-height: 1.25;
         }
 
         .tab-btn.active {
@@ -1394,15 +1396,21 @@
             <!-- 🔀 モード切り替えタブ -->
             <div class="tab-group" id="mode-tabs">
                 <button type="button" class="tab-btn active" onclick="switchMode('room')">
-                    🏠 秘密の合言葉ルーム
+                    <span style="display: block; font-size: 0.86rem; font-weight: 700;">🏠 秘密の合言葉</span>
+                    <span style="display: block; font-size: 0.65rem; opacity: 0.8; font-weight: 500; margin-top: 2px;">家族・防災・いつもの部屋</span>
                 </button>
                 <button type="button" class="tab-btn" onclick="switchMode('direct')">
-                    🔗 一期一会コード
+                    <span style="display: block; font-size: 0.86rem; font-weight: 700;">🔗 一期一会コード</span>
+                    <span style="display: block; font-size: 0.65rem; opacity: 0.8; font-weight: 500; margin-top: 2px;">その場限り・URL即通話</span>
                 </button>
             </div>
 
             <!-- 🏠 モード1：合言葉ルーム（家族・非常用集合ルーム） -->
             <div id="mode-room-panel">
+                <p style="font-size: 0.76rem; color: #cbd5e1; margin: -6px 4px 14px 4px; line-height: 1.5;">
+                    👨‍👩‍👧‍👦 家族や仲間とあらかじめ決めた<strong>「合言葉」</strong>で集まる安心ルームです。
+                </p>
+
                 <!-- 🟢 現在の待機中バナー（部屋で待機中のみ表示） -->
                 <div id="room-waiting-card" class="room-waiting-card" style="display: none;">
                     <div class="waiting-badge-header">
@@ -1423,59 +1431,79 @@
                 <div class="content-box">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                         <label class="box-label" for="room-input" style="margin-bottom: 0;">
-                            家族・仲間で決めた「合言葉」を入力 <span id="room-capacity-indicator"></span>
+                            ① 決めた合言葉を入力 <span id="room-capacity-indicator"></span>
                         </label>
                         <span id="room-online-indicator" style="font-size: 0.72rem; font-weight: 600;"></span>
                     </div>
                     <input type="text" id="room-input" placeholder="例: kazoku-3（末尾の数字＝人数）" oninput="onRoomInputChange()">
                     
                     <!-- 📷 QRコード読み取り＆印刷ボタン -->
-                    <div class="qr-action-row" style="display: flex; gap: 8px; margin-bottom: 12px;">
-                        <button type="button" class="btn-qr" onclick="openQrScanner()" style="background: rgba(14, 165, 233, 0.12); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.3); font-size: 0.82rem; padding: 10px; border-radius: 8px; width: 100%; box-shadow: none;">
+                    <div class="qr-action-row" style="display: flex; gap: 8px; margin-bottom: 14px;">
+                        <button type="button" class="btn-qr" onclick="openQrScanner()" style="background: rgba(14, 165, 233, 0.12); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.3); font-size: 0.80rem; padding: 9px; border-radius: 8px; width: 100%; box-shadow: none;">
                             📷 QRを読み取る
                         </button>
-                        <button type="button" class="btn-qr" onclick="openQrGenerator()" style="background: rgba(14, 165, 233, 0.12); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.3); font-size: 0.82rem; padding: 10px; border-radius: 8px; width: 100%; box-shadow: none;">
+                        <button type="button" class="btn-qr" onclick="openQrGenerator()" style="background: rgba(14, 165, 233, 0.12); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.3); font-size: 0.80rem; padding: 9px; border-radius: 8px; width: 100%; box-shadow: none;">
                             🖨️ ケース用QRを表示
                         </button>
                     </div>
-                    
+
+                    <span class="box-label" style="margin-bottom: 6px;">② 待つ側・かける側でボタンを押す</span>
                     <!-- 💎 洗練された通話アクション（待機＆呼ぶ デュアルカード） -->
                     <div class="room-action-grid">
                         <button type="button" class="btn-room-action btn-room-wait" onclick="joinRoomAs('wait')">
                             <span class="btn-icon-title">🏠 待機する</span>
-                            <span class="btn-sublabel">着信受付・待機</span>
+                            <span class="btn-sublabel">待つ側：着信受付</span>
                         </button>
                         <button type="button" class="btn-room-action btn-room-call" onclick="joinRoomAs('call')">
                             <span class="btn-icon-title">📞 呼ぶ</span>
-                            <span class="btn-sublabel">部屋に入って発信</span>
+                            <span class="btn-sublabel">かける側：発信</span>
                         </button>
                     </div>
 
-                    <button type="button" class="btn-sub" onclick="copyRoomLink()" style="width: 100%;">
-                        🔗 この合言葉ルームの招待URLをコピー
+                    <button type="button" class="btn-sub" onclick="copyRoomLink()" style="width: 100%; padding: 10px; font-size: 0.80rem;">
+                        🔗 この部屋の直通URLをコピーして送る
                     </button>
                 </div>
 
                 <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 4px 16px 4px; line-height: 1.5;">
-                    💡 <strong>使い方のヒント：</strong><br>
-                    合言葉の末尾に <code>-3</code> で人数認識（例: <code>kazoku-3</code> = 3人部屋）。<br>
-                    通話中は画面下でリアルタイムチャットが可能（通話を切ると履歴は自動消去されます）。
+                    💡 <strong>グループ通話のコツ：</strong><br>
+                    合言葉の末尾に <code>-3</code> や <code>-4</code> をつけると、最大4人まで同時に話せます（例: <code>kazoku-3</code>）。
                 </p>
             </div>
 
-            <!-- 🔗 モード2：一期一会コード（今までのランダムID） -->
+            <!-- 🔗 モード2：一期一会コード（その場限りのURL通話） -->
             <div id="mode-direct-panel" style="display: none;">
-                <div class="content-box">
-                    <span class="box-label">あなたの直通コード</span>
-                    <div class="id-val-row" style="margin-bottom: 12px;">
-                        <span class="my-id-text" id="my-peer-id">発行中...</span>
-                        <button class="btn-sub" onclick="copyDirectLink()">URLコピー</button>
-                    </div>
+                <p style="font-size: 0.76rem; color: #cbd5e1; margin: -6px 4px 14px 4px; line-height: 1.5;">
+                    🤝 電話番号やLINEを教えずに、<strong>今すぐ話したいときの一度きり通話</strong>です（通話を切れば痕跡ゼロ）。
+                </p>
 
-                    <label class="box-label" for="target-id-input">相手の直通コードを入力して発信</label>
-                    <input type="text" id="target-id-input" placeholder="例: ito-xxxx">
-                    <button id="direct-call-btn" onclick="startDirectCall()" disabled>
-                        <span>📞</span> 意図電話をかける
+                <!-- かけてもらう側（一番かんたん） -->
+                <div class="content-box" style="margin-bottom: 14px; border-color: rgba(56, 189, 248, 0.35);">
+                    <span style="display: block; font-size: 0.84rem; font-weight: 700; color: #38bdf8; margin-bottom: 4px;">
+                        ✨ おすすめ：相手にかけてもらう場合
+                    </span>
+                    <p style="font-size: 0.74rem; color: var(--text-muted); margin: 0 0 10px 0; line-height: 1.4;">
+                        下のボタンを押して、LINEやメールでURLをポンと送るだけ！相手はアプリ不要で即通話が始まります。
+                    </p>
+                    <button type="button" onclick="copyDirectLink()" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%); margin-bottom: 8px;">
+                        <span>🔗</span> 通話用URLをコピーする
+                    </button>
+                    <div style="font-size: 0.72rem; color: #94a3b8; text-align: center;">
+                        あなたの使い捨てコード: <strong id="my-peer-id" style="color: #38bdf8; font-family: monospace;">発行中...</strong>
+                    </div>
+                </div>
+
+                <!-- 自分からかける場合 -->
+                <div class="content-box">
+                    <span style="display: block; font-size: 0.84rem; font-weight: 700; color: #e0f2fe; margin-bottom: 4px;">
+                        📞 相手からコードを教えてもらった場合
+                    </span>
+                    <label class="box-label" for="target-id-input" style="margin-bottom: 6px;">
+                        相手から届いたコードを入力して発信
+                    </label>
+                    <input type="text" id="target-id-input" placeholder="例: ito-xxxx" style="margin-bottom: 10px;">
+                    <button id="direct-call-btn" onclick="startDirectCall()" disabled style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        <span>📞</span> 相手を呼び出す
                     </button>
                 </div>
             </div>
