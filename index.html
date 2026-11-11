@@ -1802,7 +1802,21 @@
             }
 
             const idToUse = customId || generateRandomId();
-            peer = new Peer(idToUse, { debug: 1 });
+
+            // 🛡️ プライバシー保護・TURN暗号化中継サーバー設定（IPアドレス遮蔽＆高接続率）
+            const peerConfig = {
+                debug: 1,
+                config: {
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' },
+                        { urls: 'turn:openrelay.metered.ca:80', username: 'openrelay', credential: 'openrelay' },
+                        { urls: 'turn:openrelay.metered.ca:443', username: 'openrelay', credential: 'openrelay' },
+                        { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelay', credential: 'openrelay' }
+                    ]
+                }
+            };
+            peer = new Peer(idToUse, peerConfig);
 
             peer.on('open', (id) => {
                 myPeerIdEl.textContent = id;
@@ -1842,12 +1856,24 @@
 
             // 📝 DataConnection着信（言伝用）
             peer.on('connection', (conn) => {
+                // 🛡️ 自分からの接続は破棄
+                if (conn.peer === peer.id) {
+                    try { conn.close(); } catch (e) {}
+                    return;
+                }
                 console.log('📝 Incoming DataConnection');
                 setupDataConnection(conn);
             });
 
             // 着信検知
             peer.on('call', (call) => {
+                // 🛡️ ガード3：自分自身からの着信は自動シャットアウト
+                if (call.peer === peer.id) {
+                    console.log('Self-call blocked');
+                    try { call.close(); } catch (e) {}
+                    return;
+                }
+
                 incomingCallObj = call;
                 incomingModal.style.display = 'flex';
                 startRingtone();
@@ -1988,6 +2014,16 @@
                 p2pStatus.textContent = `🟢 待機中（合言葉: ${roomName}）`;
                 initPeer(hostPeerId);
             } else {
+                // 🛡️ ガード1：すでに自分がその部屋で待機中の場合は自分自身に発信できない
+                if (currentWaitingRoom && currentWaitingRoom.toLowerCase() === roomName.toLowerCase()) {
+                    alert(`🏠 現在、合言葉「${roomName}」で待機中です。\n相手からの着信をお待ちください（自分自身には発信できません）。`);
+                    return;
+                }
+                if (peer && peer.id === hostPeerId) {
+                    alert(`🏠 現在この部屋で待機中です。相手からの着信をお待ちください。`);
+                    return;
+                }
+
                 // 相手（ホスト）を呼び出す発信
                 callTargetPeer(hostPeerId, `合言葉部屋「${roomName}」`);
             }
@@ -2114,6 +2150,12 @@
 
         // 共通発信処理（最大4人メッシュ通話対応）
         async function callTargetPeer(targetId, displayName) {
+            // 🛡️ ガード2：自分自身への発信を絶対阻止
+            if (peer && peer.id === targetId) {
+                alert('自分自身には発信できません。');
+                return;
+            }
+
             p2pStatus.textContent = `${displayName} に接続中...`;
             try {
                 const stream = await getLocalStream();
