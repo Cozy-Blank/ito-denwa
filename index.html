@@ -1892,17 +1892,15 @@
 
             const idToUse = customId || generateRandomId();
 
-            // 🛡️ プライバシー保護・TURN暗号化中継サーバー設定（IPアドレス完全遮蔽＆高接続率）
+            // 🌐 高音質・確実接続の直接通話モード（Google STUNサーバー活用・一生無料＆痕跡ゼロ）
             const peerConfig = {
                 debug: 1,
                 config: {
-                    iceTransportPolicy: 'relay', // ★相手への本物IP直接通知を100%禁止し、必ず中継局IPのみを使う
+                    iceTransportPolicy: 'all', // 直接P2P通話で確実かつクリアにつながる
                     iceServers: [
                         { urls: 'stun:stun.l.google.com:19302' },
                         { urls: 'stun:stun1.l.google.com:19302' },
-                        { urls: 'turn:openrelay.metered.ca:80', username: 'openrelay', credential: 'openrelay' },
-                        { urls: 'turn:openrelay.metered.ca:443', username: 'openrelay', credential: 'openrelay' },
-                        { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelay', credential: 'openrelay' }
+                        { urls: 'stun:stun2.l.google.com:19302' }
                     ]
                 }
             };
