@@ -1606,6 +1606,12 @@
         </div>
     </div>
 
+    <!-- 📵 不在着信バナー（画面上部に固定表示） -->
+    <div id="missed-call-banner" style="display: none; position: fixed; top: 10px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 408px; z-index: 900; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-radius: 14px; background: rgba(244,63,94,0.18); border: 1px solid rgba(244,63,94,0.55); backdrop-filter: blur(6px); box-sizing: border-box;">
+        <span id="missed-call-text" style="font-size: 0.85rem; font-weight: 700; color: #fecdd3;"></span>
+        <button type="button" onclick="clearMissedCalls()" style="width: auto; padding: 6px 12px; font-size: 0.78rem; background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.25); box-shadow: none; border-radius: 8px; cursor: pointer;">✕ 閉じる</button>
+    </div>
+
     <!-- 📞 発信・呼び出し中モーダル（キャンセル機能付き） -->
     <div id="calling-modal" class="modal-overlay">
         <div class="modal-card">
@@ -2000,17 +2006,50 @@
 
         // 🛑 着信の取り消し・終了処理（相手のキャンセル・タイムアウト時）
         function dismissIncomingCall() {
+            // 着信中でなければ何もしない（応答済み・拒否済み・二重呼び出し対策）
+            const ringingCall = incomingCallObj;
+            if (!ringingCall) return;
+            incomingCallObj = null;
+
             stopRingtone();
             if (incomingTimeoutTimer) {
                 clearTimeout(incomingTimeoutTimer);
                 incomingTimeoutTimer = null;
             }
             if (incomingModal) incomingModal.style.display = 'none';
-            if (incomingCallObj) {
-                try { incomingCallObj.close(); } catch (e) {}
-                incomingCallObj = null;
+            try { ringingCall.close(); } catch (e) {}
+
+            addMissedCall();
+        }
+
+        // 📵 不在着信（着信アリ）の表示：応答前に切れた着信を画面に残す
+        let missedCallCount = 0;
+        let missedCallLastTime = '';
+
+        function addMissedCall() {
+            missedCallCount++;
+            const now = new Date();
+            missedCallLastTime = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+            renderMissedCall();
+        }
+
+        function renderMissedCall() {
+            const box = document.getElementById('missed-call-banner');
+            if (!box) return;
+            if (missedCallCount <= 0) {
+                box.style.display = 'none';
+                return;
             }
-            showNotification('📞 相手が呼び出しをキャンセルしました', 4000);
+            const countText = missedCallCount > 1 ? `（${missedCallCount}件）` : '';
+            document.getElementById('missed-call-text').textContent =
+                `📵 不在着信${countText}　最後の着信 ${missedCallLastTime}`;
+            box.style.display = 'flex';
+        }
+
+        function clearMissedCalls() {
+            missedCallCount = 0;
+            missedCallLastTime = '';
+            renderMissedCall();
         }
 
         // 🎐 オルゴール・チャイム着信音（Web Audio API）
@@ -2441,6 +2480,7 @@
         // 着信応答（最大4人メッシュ対応）
         async function acceptCall() {
             stopRingtone();
+            clearMissedCalls();
             if (incomingTimeoutTimer) {
                 clearTimeout(incomingTimeoutTimer);
                 incomingTimeoutTimer = null;
@@ -2473,8 +2513,9 @@
             }
             incomingModal.style.display = 'none';
             if (incomingCallObj) {
-                incomingCallObj.close();
-                incomingCallObj = null;
+                const c = incomingCallObj;
+                incomingCallObj = null; // 先に空にして「不在着信」扱いを防ぐ
+                c.close();
             }
         }
 
