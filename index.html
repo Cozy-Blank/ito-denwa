@@ -1726,8 +1726,10 @@
         let currentMode = 'room'; // 'room' | 'direct'
         let currentOutgoingCall = null;
         let currentOutgoingConn = null;
+        let currentOutgoingTargetId = null;
         let callingTimeoutTimer = null;
         let dialingToneTimer = null;
+        let incomingTimeoutTimer = null;
 
         // 👥 最大4人P2Pメッシュ通話管理
         const MAX_PARTICIPANTS = 4;
@@ -1937,13 +1939,22 @@
                 }
             });
 
-            // 📝 DataConnection着信（言伝用）
+            // 📝 DataConnection着信（言伝 ＆ 制御シグナル用）
             peer.on('connection', (conn) => {
                 // 🛡️ 自分からの接続は破棄
                 if (conn.peer === peer.id) {
                     try { conn.close(); } catch (e) {}
                     return;
                 }
+
+                // 🛑 発信キャンセルシグナルを受信した場合：即座に着信音を止めて着信モーダルを閉じる
+                if (conn.metadata && conn.metadata.type === 'cancel-call') {
+                    console.log('📞 Cancel-call signal received from:', conn.peer);
+                    dismissIncomingCall(conn.peer);
+                    try { conn.close(); } catch (e) {}
+                    return;
+                }
+
                 console.log('📝 Incoming DataConnection');
                 setupDataConnection(conn);
             });
@@ -1961,12 +1972,48 @@
                 incomingModal.style.display = 'flex';
                 startRingtone();
 
+                // 40秒間応答がない場合は着信音を自動停止（鳴りっぱなし防止）
+                if (incomingTimeoutTimer) clearTimeout(incomingTimeoutTimer);
+                incomingTimeoutTimer = setTimeout(() => {
+                    dismissIncomingCall(call.peer);
+                }, 40000);
+
                 // 相手が応答前に切った場合も音を止めてモーダルを閉じる
                 call.on('close', () => {
-                    stopRingtone();
-                    incomingModal.style.display = 'none';
+                    dismissIncomingCall(call.peer);
                 });
             });
+        }
+
+        // 🔔 やさしい画面通知トースト（自動消去）
+        function showNotification(msg, duration = 4000) {
+            const t = document.getElementById('zero-trace-toast');
+            if (!t) return;
+            const originalText = '🍃 通話は終了しました。音声・言伝すべてのデータがサーバー・端末から完全消去されました。';
+            t.textContent = msg;
+            t.style.display = 'block';
+            setTimeout(() => {
+                t.style.display = 'none';
+                t.textContent = originalText;
+            }, duration);
+        }
+
+        // 🛑 着信の取り消し・終了処理（相手のキャンセル・タイムアウト時）
+        function dismissIncomingCall(callerPeerId = null) {
+            if (callerPeerId && incomingCallObj && incomingCallObj.peer !== callerPeerId) {
+                return;
+            }
+            stopRingtone();
+            if (incomingTimeoutTimer) {
+                clearTimeout(incomingTimeoutTimer);
+                incomingTimeoutTimer = null;
+            }
+            if (incomingModal) incomingModal.style.display = 'none';
+            if (incomingCallObj) {
+                try { incomingCallObj.close(); } catch (e) {}
+                incomingCallObj = null;
+            }
+            showNotification('📞 相手が呼び出しをキャンセルしました', 4000);
         }
 
         // 🎐 オルゴール・チャイム着信音（Web Audio API）
@@ -2287,6 +2334,8 @@
                 return;
             }
 
+            currentOutgoingTargetId = targetId;
+
             // 📞 呼び出し中モーダルを表示
             const modal = document.getElementById('calling-modal');
             const targetTitle = document.getElementById('calling-target-title');
@@ -2337,6 +2386,31 @@
             const modal = document.getElementById('calling-modal');
             if (modal) modal.style.display = 'none';
 
+            // 📡 相手に着信キャンセルシグナルを確実に即時送信（相手の着信音を瞬時に停止！）
+            const targetPeerId = currentOutgoingTargetId || (currentOutgoingCall ? currentOutgoingCall.peer : null) || (currentOutgoingConn ? currentOutgoingConn.peer : null);
+            if (targetPeerId && peer && peer.open) {
+                // 1. もしDataConnectionが開いていればメッセージを直接送信
+                if (currentOutgoingConn && currentOutgoingConn.open) {
+                    try {
+                        currentOutgoingConn.send({ type: 'cancel-call', callerId: peer.id });
+                    } catch (e) {}
+                }
+                // 2. PeerJSシグナリングサーバー（WebSocket）経由で即時キャンセルシグナルを送信
+                try {
+                    const cancelConn = peer.connect(targetPeerId, {
+                        metadata: { type: 'cancel-call', callerId: peer.id },
+                        reliable: false
+                    });
+                    setTimeout(() => {
+                        try { cancelConn.close(); } catch (e) {}
+                    }, 2500);
+                } catch (e) {
+                    console.log('Error dispatching cancel signal:', e);
+                }
+            }
+
+            currentOutgoingTargetId = null;
+
             if (currentOutgoingCall) {
                 try { currentOutgoingCall.close(); } catch (e) {}
                 const peerId = currentOutgoingCall.peer;
@@ -2363,6 +2437,10 @@
         // 着信応答（最大4人メッシュ対応）
         async function acceptCall() {
             stopRingtone();
+            if (incomingTimeoutTimer) {
+                clearTimeout(incomingTimeoutTimer);
+                incomingTimeoutTimer = null;
+            }
             incomingModal.style.display = 'none';
             p2pStatus.textContent = '接続中...';
 
@@ -2385,6 +2463,10 @@
         // 着信拒否
         function rejectCall() {
             stopRingtone();
+            if (incomingTimeoutTimer) {
+                clearTimeout(incomingTimeoutTimer);
+                incomingTimeoutTimer = null;
+            }
             incomingModal.style.display = 'none';
             if (incomingCallObj) {
                 incomingCallObj.close();
@@ -2686,7 +2768,10 @@
             });
 
             conn.on('data', (data) => {
-                if (data && data.type === 'member-list') {
+                if (data && data.type === 'cancel-call') {
+                    console.log('📞 Cancel-call message received from:', conn.peer);
+                    dismissIncomingCall(conn.peer);
+                } else if (data && data.type === 'member-list') {
                     // 他の参加者リストを受信したら自動でメッシュ接続
                     handleMemberList(data.members);
                 } else {
@@ -2696,6 +2781,10 @@
 
             conn.on('close', () => {
                 console.log('📝 DataChannel closed with ' + peerId);
+                // 応答前の着信相手のDataConnectionが切断された場合も着信終了
+                if (incomingCallObj && incomingCallObj.peer === peerId) {
+                    dismissIncomingCall(peerId);
+                }
                 delete activeDataConns[peerId];
             });
 
