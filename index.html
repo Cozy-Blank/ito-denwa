@@ -1999,10 +1999,7 @@
         }
 
         // 🛑 着信の取り消し・終了処理（相手のキャンセル・タイムアウト時）
-        function dismissIncomingCall(callerPeerId = null) {
-            if (callerPeerId && incomingCallObj && incomingCallObj.peer !== callerPeerId) {
-                return;
-            }
+        function dismissIncomingCall() {
             stopRingtone();
             if (incomingTimeoutTimer) {
                 clearTimeout(incomingTimeoutTimer);
@@ -2424,6 +2421,13 @@
                 const peerId = currentOutgoingConn.peer;
                 delete activeDataConns[peerId];
                 currentOutgoingConn = null;
+            }
+
+            // 🛡️ 発信元Peerの再生成（シグナリングサーバーから相手へLEAVEメッセージを強制送信し、相手側着信を100%遮断）
+            if (!currentWaitingRoom) {
+                setTimeout(() => {
+                    initPeer();
+                }, 350);
             }
 
             if (currentWaitingRoom) {
