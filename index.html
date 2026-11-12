@@ -1606,6 +1606,22 @@
         </div>
     </div>
 
+    <!-- 📞 発信・呼び出し中モーダル（キャンセル機能付き） -->
+    <div id="calling-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="pulsing-wave" style="margin: 0 auto 16px auto;">📞</div>
+            <h3 id="calling-target-title" style="margin: 0 0 8px 0; color: #fff;">呼び出し中...</h3>
+            <p id="calling-target-desc" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 22px;">
+                相手の応答を待っています
+            </p>
+            <div style="display: flex; justify-content: center; width: 100%;">
+                <button type="button" onclick="cancelOutgoingCall()" class="btn-secondary" style="background: rgba(244,63,94,0.15); color: #f43f5e; border: 1px solid rgba(244,63,94,0.4); padding: 12px 24px; font-weight: 700; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    ✕ 呼び出しをキャンセル
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- 🔔 着信モーダル -->
     <div id="incoming-modal" class="modal-overlay">
         <div class="modal-card">
@@ -1688,7 +1704,7 @@
 
     <!-- リモート音声再生用要素（非表示・最大4人メッシュ対応） -->
     <audio id="remote-audio" autoplay playsinline></audio>
-    <div id="remote-audios" style="display: none;"></div>
+    <div id="remote-audios" style="position: fixed; width: 0; height: 0; opacity: 0; pointer-events: none; overflow: hidden;" aria-hidden="true"></div>
 
     <script>
         // Service Worker の登録（PWA用）
@@ -1708,6 +1724,10 @@
         let elapsedSeconds = 0;
         let isMuted = false;
         let currentMode = 'room'; // 'room' | 'direct'
+        let currentOutgoingCall = null;
+        let currentOutgoingConn = null;
+        let callingTimeoutTimer = null;
+        let dialingToneTimer = null;
 
         // 👥 最大4人P2Pメッシュ通話管理
         const MAX_PARTICIPANTS = 4;
@@ -1869,6 +1889,7 @@
                 debug: 1,
                 config: {
                     iceTransportPolicy: 'relay', // ★相手への本物IP直接通知を100%禁止し、必ず中継局IPのみを使う
+                    iceCandidatePoolSize: 10,    // ★事前に中継候補をプール（接続までの待機時間・発信ラグを劇的短縮）
                     iceServers: [
                         { urls: 'stun:stun.l.google.com:19302' },
                         { urls: 'stun:stun1.l.google.com:19302' },
@@ -2045,10 +2066,58 @@
             }
         }
 
-        // マイク音声の取得
+        // 📞 発信・呼び出し中のやさしいダイアル音（Web Audio API）
+        function playDialingPhrase() {
+            try {
+                const ctx = ensureAudioContext();
+                if (!ctx) return;
+                const startTime = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, startTime); // やさしいA4音（ラ）
+
+                gain.gain.setValueAtTime(0.001, startTime);
+                gain.gain.exponentialRampToValueAtTime(0.06, startTime + 0.05);
+                gain.gain.setValueAtTime(0.06, startTime + 0.9);
+                gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 1.0);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start(startTime);
+                osc.stop(startTime + 1.0);
+            } catch (e) {}
+        }
+
+        function startDialingTone() {
+            stopDialingTone();
+            playDialingPhrase();
+            dialingToneTimer = setInterval(playDialingPhrase, 2800);
+        }
+
+        function stopDialingTone() {
+            if (dialingToneTimer) {
+                clearInterval(dialingToneTimer);
+                dialingToneTimer = null;
+            }
+        }
+
+        // マイク音声の取得（3人以上の通話でも途切れないモノラル＆ノイズ抑制最適化）
         async function getLocalStream() {
             if (!localStream) {
-                localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,      // エコーキャンセラー（反響音を防止）
+                        noiseSuppression: true,      // ノイズサプレッション（周囲の生活音・風切り音を消去）
+                        autoGainControl: true,       // オートゲイン（小さな声を適正音量に自動調整）
+                        channelCount: 1,             // ★モノラル化（データ量を半減し、3人通話でも回線溢れ・途切れを防止）
+                        sampleRate: 48000,
+                        sampleSize: 16
+                    },
+                    video: false
+                });
             }
             return localStream;
         }
@@ -2218,21 +2287,75 @@
                 return;
             }
 
+            // 📞 呼び出し中モーダルを表示
+            const modal = document.getElementById('calling-modal');
+            const targetTitle = document.getElementById('calling-target-title');
+            const targetDesc = document.getElementById('calling-target-desc');
+            if (targetTitle) targetTitle.textContent = `${displayName} を呼び出し中...`;
+            if (targetDesc) targetDesc.textContent = '相手の応答をお待ちください';
+            if (modal) modal.style.display = 'flex';
+
             p2pStatus.textContent = `${displayName} に接続中...`;
+            startDialingTone();
+
+            // 45秒の呼び出しタイムアウト（相手が出ない場合は安全に終了）
+            if (callingTimeoutTimer) clearTimeout(callingTimeoutTimer);
+            callingTimeoutTimer = setTimeout(() => {
+                cancelOutgoingCall();
+                alert('相手が応答しませんでした。\n合言葉や接続状態を確認して、もう一度お試しください。');
+            }, 45000);
+
             try {
                 const stream = await getLocalStream();
                 myMemberId = generateMemberId();
 
                 const call = peer.call(targetId, stream);
+                currentOutgoingCall = call;
                 setupCallEvents(call);
 
                 // 言伝＆メッシュ制御用DataConnection
                 const conn = peer.connect(targetId, { reliable: true });
+                currentOutgoingConn = conn;
                 setupDataConnection(conn);
 
             } catch (err) {
                 console.error(err);
+                cancelOutgoingCall();
                 alert('マイクのアクセスが許可されませんでした。ブラウザの設定からマイクを許可してください。');
+                p2pStatus.textContent = 'P2P回線：通話待機中';
+            }
+        }
+
+        // ✕ 発信（呼び出し）のキャンセル処理
+        function cancelOutgoingCall() {
+            stopDialingTone();
+            if (callingTimeoutTimer) {
+                clearTimeout(callingTimeoutTimer);
+                callingTimeoutTimer = null;
+            }
+
+            const modal = document.getElementById('calling-modal');
+            if (modal) modal.style.display = 'none';
+
+            if (currentOutgoingCall) {
+                try { currentOutgoingCall.close(); } catch (e) {}
+                const peerId = currentOutgoingCall.peer;
+                delete activeCalls[peerId];
+                removeRemoteAudio(peerId);
+                currentOutgoingCall = null;
+            }
+
+            if (currentOutgoingConn) {
+                try { currentOutgoingConn.close(); } catch (e) {}
+                const peerId = currentOutgoingConn.peer;
+                delete activeDataConns[peerId];
+                currentOutgoingConn = null;
+            }
+
+            if (currentWaitingRoom) {
+                showWaitingCard(currentWaitingRoom);
+                p2pStatus.textContent = `🟢 待機中（合言葉: ${currentWaitingRoom}）`;
+            } else {
                 p2pStatus.textContent = 'P2P回線：通話待機中';
             }
         }
@@ -2249,6 +2372,7 @@
                 if (incomingCallObj) {
                     incomingCallObj.answer(stream);
                     setupCallEvents(incomingCallObj);
+                    optimizeAudioSender(incomingCallObj);
                     incomingCallObj = null;
                 }
             } catch (err) {
@@ -2274,11 +2398,28 @@
             activeCalls[peerId] = call;
 
             call.on('stream', (remoteStream) => {
+                // 応答があったので発信モーダルと呼出音を停止
+                stopDialingTone();
+                if (callingTimeoutTimer) {
+                    clearTimeout(callingTimeoutTimer);
+                    callingTimeoutTimer = null;
+                }
+                const modal = document.getElementById('calling-modal');
+                if (modal) modal.style.display = 'none';
+                currentOutgoingCall = null;
+                currentOutgoingConn = null;
+
                 addRemoteAudio(peerId, remoteStream);
                 showInCallScreen();
+                optimizeAudioSender(call);
             });
 
             call.on('close', () => {
+                stopDialingTone();
+                const modal = document.getElementById('calling-modal');
+                if (modal && modal.style.display === 'flex') {
+                    modal.style.display = 'none';
+                }
                 delete activeCalls[peerId];
                 removeRemoteAudio(peerId);
                 if (Object.keys(activeCalls).length === 0) {
@@ -2290,6 +2431,11 @@
 
             call.on('error', (err) => {
                 console.error('Call error with ' + peerId, err);
+                stopDialingTone();
+                const modal = document.getElementById('calling-modal');
+                if (modal && modal.style.display === 'flex') {
+                    modal.style.display = 'none';
+                }
                 delete activeCalls[peerId];
                 removeRemoteAudio(peerId);
                 if (Object.keys(activeCalls).length === 0) {
@@ -2298,6 +2444,29 @@
                     updateParticipantsBadge();
                 }
             });
+        }
+
+        // 🎙️ 音声ビットレート制御（3〜4人メッシュ通話時のパケット溢れ＆途切れ防止）
+        function optimizeAudioSender(call) {
+            try {
+                if (!call || !call.peerConnection) return;
+                const pc = call.peerConnection;
+                if (!pc.getSenders) return;
+                pc.getSenders().forEach(sender => {
+                    if (sender && sender.track && sender.track.kind === 'audio') {
+                        const params = sender.getParameters ? sender.getParameters() : null;
+                        if (params && params.encodings && params.encodings.length > 0) {
+                            // 32kbpsに最適化（クリアな通話品質を維持しつつ、3人以上でも回線帯域を圧迫しないベストバランス）
+                            params.encodings[0].maxBitrate = 32000;
+                            params.encodings[0].priority = 'high';
+                            params.encodings[0].networkPriority = 'high';
+                            sender.setParameters(params).catch(() => {});
+                        }
+                    }
+                });
+            } catch (e) {
+                console.log('optimizeAudioSender notice:', e);
+            }
         }
 
         // 通話中画面の表示
@@ -2350,6 +2519,16 @@
         // 通話終了処理（痕跡完全消去）
         function endCallLocally() {
             stopRingtone();
+            stopDialingTone();
+            if (callingTimeoutTimer) {
+                clearTimeout(callingTimeoutTimer);
+                callingTimeoutTimer = null;
+            }
+            const callingModal = document.getElementById('calling-modal');
+            if (callingModal) callingModal.style.display = 'none';
+            currentOutgoingCall = null;
+            currentOutgoingConn = null;
+
             clearInterval(timerInterval);
             timerInterval = null;
 
