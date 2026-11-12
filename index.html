@@ -1557,17 +1557,17 @@
                 🍃 通話は終了しました。音声・言伝すべてのデータがサーバー・端末から完全消去されました。
             </div>
 
-            <!-- 📖 使い方・各ブラウザ別アプリ化ガイドリンク -->
-            <a href="guide.html" class="guide-banner-link">
+            <!-- 📖 使い方・各ブラウザ別アプリ化ガイド（ページ遷移せずモーダルで開く） -->
+            <button type="button" onclick="openGuideModal()" class="guide-banner-link" style="width: 100%; cursor: pointer;">
                 <div class="guide-banner-content">
                     <span class="guide-banner-icon">📖</span>
-                    <div class="guide-banner-text">
+                    <div class="guide-banner-text" style="text-align: left;">
                         <strong>使い方＆アプリ化ガイド</strong>
                         <span>Brave・Safari・Chromeでの全画面追加とマイク設定</span>
                     </div>
                 </div>
                 <span class="guide-banner-arrow">➔</span>
-            </a>
+            </button>
 
             <p class="footer-note">
                 ※WebRTC暗号化通信。音声はサーバーを通さず端末同士で直接やりとりされ、通話終了後に痕跡は完全消滅します。
@@ -1620,6 +1620,67 @@
                 </button>
                 <button onclick="rejectCall()" class="btn-secondary" style="background: #1e293b; color: #f43f5e; border: 1px solid rgba(244,63,94,0.3);">
                     拒否
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📖 取扱説明書＆アプリ化ガイド モーダル（ページ遷移なし・通話待機を切断しない） -->
+    <div id="guide-modal" class="modal-overlay" onclick="closeGuideModal(event)">
+        <div class="modal-card" style="max-width: 440px; max-height: 85vh; display: flex; flex-direction: column; padding: 0; text-align: left; overflow: hidden; border-color: rgba(56, 189, 248, 0.45); background: #070a18;" onclick="event.stopPropagation()">
+            <div style="padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; background: linear-gradient(90deg, #070616 0%, #1b1a68 100%);">
+                <div style="font-size: 0.95rem; font-weight: 700; color: #e0f2fe; display: flex; align-items: center; gap: 8px;">
+                    📖 使い方＆アプリ化ガイド
+                </div>
+                <button type="button" onclick="closeGuideModal()" style="background: transparent; border: none; color: #94a3b8; font-size: 1.3rem; cursor: pointer; padding: 0 6px; width: auto; box-shadow: none;">✕</button>
+            </div>
+            
+            <div style="padding: 16px 18px; overflow-y: auto; font-size: 0.82rem; line-height: 1.6; color: #cbd5e1; -webkit-overflow-scrolling: touch;">
+                <h4 style="margin: 0 0 10px 0; color: #38bdf8; font-size: 0.9rem;">📲 ホーム画面に追加してアプリ化する</h4>
+                <p style="font-size: 0.76rem; color: #94a3b8; margin: 0 0 12px 0;">
+                    ホーム画面に追加すると、アドレスバーが消えて本物のスマホアプリのように全画面で起動できます。
+                </p>
+
+                <!-- 🦁 Brave -->
+                <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px;">
+                    <strong style="color: #fff; font-size: 0.85rem;">🦁 Braveブラウザをお使いの方</strong>
+                    <ol style="margin: 6px 0 0 0; padding-left: 20px; font-size: 0.78rem;">
+                        <li>メニュー（画面上または下の<strong>「…」</strong>や<strong>「︙」</strong>）をタップ</li>
+                        <li><strong>「ホーム画面に追加」</strong>をタップ</li>
+                    </ol>
+                    <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 6px 8px; margin-top: 6px; font-size: 0.72rem; color: #a7f3d0;">
+                        💡 <strong>マイク許可：</strong>スマホの「設定 ＞ アプリ ＞ Brave ＞ 権限 ＞ マイク」を「アプリ使用中のみ許可」にしておくとスムーズです。
+                    </div>
+                </div>
+
+                <!-- 🧭 Safari -->
+                <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px;">
+                    <strong style="color: #fff; font-size: 0.85rem;">🧭 Safari（iPhone / iPad）をお使いの方</strong>
+                    <ol style="margin: 6px 0 0 0; padding-left: 20px; font-size: 0.78rem;">
+                        <li>画面下の<strong>「共有ボタン（四角から矢印 ⎋）」</strong>をタップ</li>
+                        <li><strong>「ホーム画面に追加」</strong>をタップ</li>
+                    </ol>
+                </div>
+
+                <!-- 🌐 Chrome -->
+                <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px;">
+                    <strong style="color: #fff; font-size: 0.85rem;">🌐 Google Chromeをお使いの方</strong>
+                    <ol style="margin: 6px 0 0 0; padding-left: 20px; font-size: 0.78rem;">
+                        <li>右上の<strong>「メニュー（︙）」</strong> ➡️ <strong>「アプリをインストール」</strong>または<strong>「ホーム画面に追加」</strong></li>
+                    </ol>
+                </div>
+
+                <h4 style="margin: 14px 0 8px 0; color: #38bdf8; font-size: 0.9rem;">💡 便利な使い方のヒント</h4>
+                <ul style="margin: 0; padding-left: 18px; font-size: 0.78rem; color: #cbd5e1;">
+                    <li><strong>最大4人通話：</strong> 合言葉の末尾に <code>-3</code> や <code>-4</code> をつけると自動で複数人部屋になります。</li>
+                    <li><strong>マイ合言葉チップ：</strong> 使った部屋は上に保存され、ワンタップで電光看板を切り替えられます。</li>
+                    <li><strong>安心の痕跡ゼロ：</strong> 通話を切ると、音声もチャットもすべて端末・サーバーから完全消去されます。</li>
+                </ul>
+            </div>
+            
+            <div style="padding: 10px 16px; border-top: 1px solid rgba(255,255,255,0.08); background: rgba(7, 6, 22, 0.8); text-align: center;">
+                <button type="button" onclick="closeGuideModal()" style="padding: 10px; font-size: 0.85rem; border-radius: 8px; width: 100%;">
+                    ✕ 閉じてアプリに戻る
                 </button>
             </div>
         </div>
@@ -1803,10 +1864,11 @@
 
             const idToUse = customId || generateRandomId();
 
-            // 🛡️ プライバシー保護・TURN暗号化中継サーバー設定（IPアドレス遮蔽＆高接続率）
+            // 🛡️ プライバシー保護・TURN暗号化中継サーバー設定（IPアドレス完全遮蔽＆高接続率）
             const peerConfig = {
                 debug: 1,
                 config: {
+                    iceTransportPolicy: 'relay', // ★相手への本物IP直接通知を100%禁止し、必ず中継局IPのみを使う
                     iceServers: [
                         { urls: 'stun:stun.l.google.com:19302' },
                         { urls: 'stun:stun1.l.google.com:19302' },
@@ -2768,6 +2830,20 @@
             }
             const modal = document.getElementById('ticker-modal');
             if (modal) modal.classList.remove('open');
+        }
+
+        // 📖 取扱説明書＆アプリ化ガイド モーダルの開閉（ページ遷移せず通話状態を完全維持）
+        function openGuideModal() {
+            const modal = document.getElementById('guide-modal');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function closeGuideModal(event) {
+            if (event && event.target && event.target.id !== 'guide-modal') {
+                return;
+            }
+            const modal = document.getElementById('guide-modal');
+            if (modal) modal.style.display = 'none';
         }
 
         
